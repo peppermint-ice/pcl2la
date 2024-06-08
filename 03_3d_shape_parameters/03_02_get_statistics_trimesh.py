@@ -50,7 +50,7 @@ if os.path.isdir(value_folder_path):
             print('TypeError: something is not good')
 
     # Save the results to CSV
-    csv_folder_path = paths["ready_for_training"]
+    csv_folder_path = folder_paths["ready_for_training"]
     simples_file_name = approach + "_" + value + "trimesh_simple.csv"
     simples_path = os.path.join(csv_folder_path, simples_file_name)
     repaired_file_name = approach + "_" + value + "trimesh_repaired.csv"
