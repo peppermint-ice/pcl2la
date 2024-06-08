@@ -45,7 +45,7 @@ if os.path.isdir(value_folder_path):
             print('TypeError: something is not good')
 
     # Convert data to DataFrame and transpose it
-    df = pd.DataFrame(data).transpose()
+    # df = pd.DataFrame(data).transpose()
 
     # Save the transposed DataFrame to CSV
     csv_folder_path = folder_paths["ready_for_training"]
