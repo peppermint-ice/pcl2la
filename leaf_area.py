@@ -563,7 +563,7 @@ def calculate_shape_parameters(point_cloud_data_file, shape, total_volume):
 
 
 
-def calculate_statistics_trimesh(mesh_file_path):
+def calculate_statistics_trimesh(mesh_file_path, repair=True):
     """
     :param mesh_file_path: Path to your .ply mesh file
     :return: A list of two dictionaries containing all the statistics of the mesh without any corrections
@@ -634,32 +634,41 @@ def calculate_statistics_trimesh(mesh_file_path):
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    # Load a mesh
-    mesh = trimesh.load(mesh_file_path)
-    print(mesh_file_path)
-    print('Stats for the mesh: ')
-    # Calculate first statistics for the simples
-    simples = calculate_parameters(mesh)
+    if repair:
+        # Load a mesh
+        mesh = trimesh.load(mesh_file_path)
+        print(mesh_file_path)
+        print('Stats for the mesh: ')
+        # Calculate first statistics for the simples
+        simples = calculate_parameters(mesh)
 
-    # Fix the mesh in steps to avoid high memory usage
-    try:
-        mesh.merge_vertices,
-        trimesh.repair.fix_inversion,
-        trimesh.repair.fix_normals,
-        trimesh.repair.fill_holes,
-        trimesh.repair.fix_winding,
-        trimesh.repair.fill_holes,
-        trimesh.repair.fix_normals,
-        print('Stats for the repaired mesh: ')
-        # Calculate statistics for the repaired mesh
-        repaired = calculate_parameters(mesh)
-    except Exception as e:
-        print('Error')
-        repaired = {'repaired': 'repaired'}
+        # Fix the mesh in steps to avoid high memory usage
+        try:
+            mesh.merge_vertices,
+            trimesh.repair.fix_inversion,
+            trimesh.repair.fix_normals,
+            trimesh.repair.fill_holes,
+            trimesh.repair.fix_winding,
+            trimesh.repair.fill_holes,
+            trimesh.repair.fix_normals,
+            print('Stats for the repaired mesh: ')
+            # Calculate statistics for the repaired mesh
+            repaired = calculate_parameters(mesh)
+        except Exception as e:
+            print('Error')
+            repaired = {'repaired': 'repaired'}
 
 
-    return [simples, repaired]
+        return [simples, repaired]
+    else:
+        # Load a mesh
+        mesh = trimesh.load(mesh_file_path)
+        print(mesh_file_path)
+        print('Stats for the mesh: ')
+        # Calculate first statistics for the simples
+        simples = calculate_parameters(mesh)
 
+        return simples
 
 if __name__ == '__main__':
     folders_paths = paths.get_paths()
