@@ -19,8 +19,8 @@ print(value_folder_path)
 
 # Check if the value_folder_path is a directory
 if os.path.isdir(value_folder_path):
-    simples = pd.DataFrame()
-    repaired = pd.DataFrame()
+    simples_data = []
+    repaired_data = []
 
     for ply in os.listdir(value_folder_path):
         print('start analysis')
@@ -43,20 +43,23 @@ if os.path.isdir(value_folder_path):
                 stats[1]['parameter_name'] = approach
                 stats[1]['parameter_value'] = value
 
-                simples = pd.concat([simples, pd.Series(stats[0])], axis=1, ignore_index=True)
-                repaired = pd.concat([repaired, pd.Series(stats[1])], axis=1, ignore_index=True)
+                simples_data.append(stats[0])
+                repaired_data.append(stats[1])
                 print("")
         except TypeError:
             print('TypeError: something is not good')
 
-    # Save the results to CSV
+    # Convert data to DataFrame and transpose it
+    simples_df = pd.DataFrame(simples_data).transpose()
+    repaired_df = pd.DataFrame(repaired_data).transpose()
+
+    # Save the transposed DataFrames to CSV
     csv_folder_path = folder_paths["ready_for_training"]
-    simples_file_name = approach + "_" + value + "trimesh_simple.csv"
+    simples_file_name = approach + "_" + value + "_trimesh_simple.csv"
     simples_path = os.path.join(csv_folder_path, simples_file_name)
-    repaired_file_name = approach + "_" + value + "trimesh_repaired.csv"
+    repaired_file_name = approach + "_" + value + "_trimesh_repaired.csv"
     repaired_path = os.path.join(csv_folder_path, repaired_file_name)
-    simples.to_csv(simples_path, index=False)
-    repaired.to_csv(repaired_path, index=False)
+    simples_df.to_csv(simples_path, index=False)
+    repaired_df.to_csv(repaired_path, index=False)
     print("Files saved here: ", simples_path)
     print("Files saved here: ", repaired_path)
-

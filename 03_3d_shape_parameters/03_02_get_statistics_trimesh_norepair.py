@@ -19,7 +19,7 @@ print(value_folder_path)
 
 # Check if the value_folder_path is a directory
 if os.path.isdir(value_folder_path):
-    simples = pd.DataFrame()
+    data = []
 
     for ply in os.listdir(value_folder_path):
         print('start analysis')
@@ -39,14 +39,17 @@ if os.path.isdir(value_folder_path):
                 stats['parameter_name'] = approach
                 stats['parameter_value'] = value
 
-                simples = pd.concat([simples, pd.Series(stats)], axis=1, ignore_index=True)
+                data.append(stats)
                 print("")
         except TypeError:
             print('TypeError: something is not good')
 
-    # Save the results to CSV
+    # Convert data to DataFrame and transpose it
+    df = pd.DataFrame(data).transpose()
+
+    # Save the transposed DataFrame to CSV
     csv_folder_path = folder_paths["ready_for_training"]
-    simples_file_name = approach + "_" + value + "trimesh_simple.csv"
+    simples_file_name = approach + "_" + value + "_trimesh_simple.csv"
     simples_path = os.path.join(csv_folder_path, simples_file_name)
-    simples.to_csv(simples_path, index=False)
+    df.to_csv(simples_path, index=False)
     print("Files saved here: ", simples_path)
