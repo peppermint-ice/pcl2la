@@ -57,4 +57,6 @@ if os.path.isdir(value_folder_path):
     repaired_path = os.path.join(csv_folder_path, repaired_file_name)
     simples.to_csv(simples_path, index=False)
     repaired.to_csv(repaired_path, index=False)
+    print("Files saved here: ", simples_path)
+    print("Files saved here: ", repaired_path)
 
