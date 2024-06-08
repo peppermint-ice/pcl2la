@@ -14,7 +14,8 @@ folder_path = folder_paths["meshes"]
 approach_folder_path = os.path.join(folder_path, approach)
 value_folder_path = os.path.join(approach_folder_path, value)
 print('folders set')
-
+print(approach_folder_path)
+print(value_folder_path)
 
 # Check if the value_folder_path is a directory
 if os.path.isdir(value_folder_path):
