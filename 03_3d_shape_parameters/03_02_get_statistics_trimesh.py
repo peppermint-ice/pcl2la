@@ -13,6 +13,8 @@ folder_paths = paths.get_paths()
 folder_path = folder_paths["meshes"]
 approach_folder_path = os.path.join(folder_path, approach)
 value_folder_path = os.path.join(approach_folder_path, value)
+print('folders set')
+
 
 # Check if the value_folder_path is a directory
 if os.path.isdir(value_folder_path):
@@ -20,9 +22,11 @@ if os.path.isdir(value_folder_path):
     repaired = pd.DataFrame()
 
     for ply in os.listdir(value_folder_path):
+        print('start analysis')
         try:
             # Run analysis
             ply_path = os.path.join(value_folder_path, ply)
+            print(ply_path)
             stats = la.calculate_statistics_trimesh(ply_path)
             # Add data about the files to the analysis results
             #       1. Get measured leaf area data
