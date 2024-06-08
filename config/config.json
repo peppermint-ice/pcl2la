@@ -1,0 +1,15 @@
+{
+    "gdrive": {
+        "plys": "G:/My Drive/Dmitrii - Ph.D Thesis/Frost room Experiment Data/LA/plys"
+    },
+    "lab_pc": {
+        "plys": "D:/results/plys"
+    },
+    "home": {
+        "plys": "C:/Users/dusen/Documents/PhD/plys"
+    },
+
+    "hurcs": {
+        "plys": "/sci/archive/davidhelman/d_usenko/plys"
+    }
+}
