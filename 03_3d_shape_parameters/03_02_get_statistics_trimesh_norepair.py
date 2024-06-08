@@ -39,7 +39,7 @@ if os.path.isdir(value_folder_path):
                 stats['parameter_name'] = approach
                 stats['parameter_value'] = value
 
-                simples = pd.concat([simples, pd.Series(stats[0])], axis=1, ignore_index=True)
+                simples = pd.concat([simples, pd.Series(stats)], axis=1, ignore_index=True)
                 print("")
         except TypeError:
             print('TypeError: something is not good')
