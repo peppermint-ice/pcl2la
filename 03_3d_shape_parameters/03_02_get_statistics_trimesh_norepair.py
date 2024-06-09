@@ -38,8 +38,6 @@ if __name__ == '__main__':
                     measured_leaf_area = float(match.group().replace('p', '.')[:-1])
                     print('Measured leaf area:', measured_leaf_area)
                     stats['measured_leaf_area'] = measured_leaf_area
-                    stats['parameter_name'] = approach
-                    stats['parameter_value'] = value
 
                     data.append(stats)
                     print("")
