@@ -721,24 +721,28 @@ def eliminate_outliers_and_scale(file_path, export_path):
         df = df[(df[column] < limit[0]) & (df[column] > limit[1])]
     df.reset_index(drop=True, inplace=True)
 
-    # Print number of rows after outlier removal
-    print('after:', len(df))
+    # Check if there are any rows left after outlier removal
+    if len(df) > 0:
+        # Print number of rows after outlier removal
+        print('after:', len(df))
 
-    # Print min and max of each column for debugging
-    for column in df.columns:
-        print(column, df[column].min(), df[column].max())
+        # Print min and max of each column for debugging
+        for column in df.columns:
+            print(column, df[column].min(), df[column].max())
 
-    # Create an instance of StandardScaler
-    scaler = StandardScaler()
+        # Create an instance of StandardScaler
+        scaler = StandardScaler()
 
-    # Fit the scaler on the data and transform it
-    scaled_data = scaler.fit_transform(df)
+        # Fit the scaler on the data and transform it
+        scaled_data = scaler.fit_transform(df)
 
-    # Convert the scaled data back to a DataFrame
-    scaled_df = pd.DataFrame(scaled_data, columns=df.columns)
+        # Convert the scaled data back to a DataFrame
+        scaled_df = pd.DataFrame(scaled_data, columns=df.columns)
 
-    # Save the processed file
-    scaled_df.to_csv(export_path, index=False)
+        # Save the processed file
+        scaled_df.to_csv(export_path, index=False)
+    else:
+        print("No data left after outlier removal. Exporting an empty DataFrame.")
 
 if __name__ == '__main__':
     folders_paths = paths.get_paths()
