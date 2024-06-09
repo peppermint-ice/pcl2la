@@ -10,6 +10,7 @@ from sklearn.metrics import pairwise_distances
 from scipy.spatial.transform import Rotation
 from scipy.optimize import minimize
 from config import paths
+from sklearn.preprocessing import StandardScaler
 
 import gc
 import os
@@ -689,6 +690,54 @@ def calculate_statistics_trimesh(mesh_file_path, repair=True):
         simples = calculate_parameters(mesh)
 
         return simples
+
+
+def eliminate_outliers_and_scale(file_path, export_path):
+    df = pd.read_csv(file_path)
+    cols = [
+        'height', 'length', 'width', 'volume', 'surface_area', 'aspect_ratio',
+        'components_number', 'measured_leaf_area'
+    ]
+
+    # Remove rows where any of the specified columns are zero
+    for column in cols:
+        df = df[df[column] != 0]
+
+    # Calculate limits for outlier removal
+    limits = {}
+    for column in cols:
+        data = df[column]
+        z_limit_top = 3 * data.std() + data.mean()
+        z_limit_bottom = -3 * data.std() + data.mean()
+        limits[column] = [z_limit_top, z_limit_bottom]
+
+    # Print limits for debugging
+    for column, limit in limits.items():
+        print(column, limit[1], limit[0])
+
+    # Remove outliers
+    for column, limit in limits.items():
+        df = df[(df[column] < limit[0]) & (df[column] > limit[1])]
+    df.reset_index(drop=True, inplace=True)
+
+    # Print number of rows after outlier removal
+    print('after:', len(df))
+
+    # Print min and max of each column for debugging
+    for column in df.columns:
+        print(column, df[column].min(), df[column].max())
+
+    # Create an instance of StandardScaler
+    scaler = StandardScaler()
+
+    # Fit the scaler on the data and transform it
+    scaled_data = scaler.fit_transform(df)
+
+    # Convert the scaled data back to a DataFrame
+    scaled_df = pd.DataFrame(scaled_data, columns=df.columns)
+
+    # Save the processed file
+    scaled_df.to_csv(export_path, index=False)
 
 if __name__ == '__main__':
     folders_paths = paths.get_paths()
