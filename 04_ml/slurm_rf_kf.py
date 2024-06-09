@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from scipy.stats import randint
 from sklearn.model_selection import RandomizedSearchCV, KFold
+import pickle
 
 from config import paths
 
