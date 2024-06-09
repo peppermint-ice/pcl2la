@@ -82,7 +82,7 @@ if __name__ == '__main__':
                 'Assessment_name': assessment_name,
                 'Repaired': repaired,
                 'Eliminated': eliminated,
-                'Regression_model': 'Linear Regression',
+                'Regression_model': 'Linear_regression',
                 'K_fold': i,
                 'RMSE_score_calibration': mse_cal,
                 'RMSE_score_validation': mse_val,

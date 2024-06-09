@@ -91,12 +91,6 @@ if __name__ == '__main__':
             model = XGBRegressor(**best_params)
             model.fit(X_train, y_train)
 
-            # Save the trained model to a file using pickle
-            model_file_path = os.path.join(csv_folder_path, f'model_fold_{i + 1}.pkl')
-            with open(model_file_path, 'wb') as f:
-                pickle.dump(model, f)
-            print(f"Model saved to {model_file_path}")
-
             pred_cal = model.predict(X_train)
             pred_val = model.predict(X_test)
             mse_cal = mean_squared_error(y_train, pred_cal)
