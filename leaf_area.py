@@ -694,6 +694,7 @@ def calculate_statistics_trimesh(mesh_file_path, repair=True):
 
 def eliminate_outliers_and_scale(file_path, export_path):
     df = pd.read_csv(file_path)
+    print(file_path)
     cols = [
         'height', 'length', 'width', 'volume', 'surface_area', 'aspect_ratio',
         'components_number', 'measured_leaf_area'
