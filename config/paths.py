@@ -36,7 +36,10 @@ def get_paths():
         "data": os.path.join(config[hostname]["plys"], "data"),
         "results": os.path.join(config[hostname]["plys"], "data/results"),
         "combined": os.path.join(config[hostname]["plys"], "data/combined"),
-        "ready_for_training": os.path.join(config[hostname]["plys"], "data/ready_for_training")
+        "ready_for_training": os.path.join(config[hostname]["plys"], "data/ready_for_training"),
+        "models": os.path.join(config[hostname]["plys"], "data/models"),
+        "train_sets": os.path.join(config[hostname]["plys"], "data/train_sets"),
+        "test_sets": os.path.join(config[hostname]["plys"], "data/test_sets")
     }
 
     return paths

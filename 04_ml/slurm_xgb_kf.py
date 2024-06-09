@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from scipy.stats import randint, uniform
 from sklearn.model_selection import RandomizedSearchCV, KFold
+import pickle
 
 from config import paths
 
@@ -19,6 +20,9 @@ if __name__ == '__main__':
 
     folder_paths = paths.get_paths()
     csv_folder_path = folder_paths["results"]
+    model_folder_path = folder_paths["models"]
+    train_folder_path = folder_paths["train_sets"]
+    test_folder_path = folder_paths["test_sets"]
 
     # Read the CSV file specified by the command-line argument
     df = pd.read_csv(file_path)
@@ -87,6 +91,12 @@ if __name__ == '__main__':
             model = XGBRegressor(**best_params)
             model.fit(X_train, y_train)
 
+            # Save the trained model to a file using pickle
+            model_file_path = os.path.join(csv_folder_path, f'model_fold_{i + 1}.pkl')
+            with open(model_file_path, 'wb') as f:
+                pickle.dump(model, f)
+            print(f"Model saved to {model_file_path}")
+
             pred_cal = model.predict(X_train)
             pred_val = model.predict(X_test)
             mse_cal = mean_squared_error(y_train, pred_cal)
@@ -110,7 +120,29 @@ if __name__ == '__main__':
                 'Successful_reconstructions_train': len(X_train)
             }
             results_xgb = pd.concat([results_xgb, pd.DataFrame([current_results])], ignore_index=True)
-            output_file = str(parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + '_results_kf_xgb.csv'
+
+            # Save the model using pickle
+            model_filename = str(
+                parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_model_kf_xgb_fold_" + str(
+                i) + ".pkl"
+            model_filepath = os.path.join(model_folder_path, model_filename)
+            with open(model_filepath, 'wb') as f:
+                pickle.dump(model, f)
+
+            # Save train and test datasets as CSV files
+            train_filename = str(
+                parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_train_kf_xgb_fold_" + str(
+                i) + ".csv"
+            train_filepath = os.path.join(train_folder_path, train_filename)
+            X_train.to_csv(train_filepath, index=False)
+
+            test_filename = str(
+                parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_test_kf_xgb_fold_" + str(
+                i) + ".csv"
+            test_filepath = os.path.join(test_folder_path, test_filename)
+            X_test.to_csv(test_filepath, index=False)
+
+            output_file = str(parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + '_results_kf_xgb' + '.csv'
             output_file_path = os.path.join(csv_folder_path, output_file)
     except ValueError:
         print('A small dataset. Cannot calculate')
