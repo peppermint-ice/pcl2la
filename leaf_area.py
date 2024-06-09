@@ -562,11 +562,11 @@ def calculate_shape_parameters(point_cloud_data_file, shape, total_volume):
     return parameters
 
 
-
 def calculate_statistics_trimesh(mesh_file_path, repair=True):
     """
     :param mesh_file_path: Path to your .ply mesh file
     :return: A list of two dictionaries containing all the statistics of the mesh without any corrections
+    :repair: Bool to set if you want to repair the mesh
     """
 
     def calculate_parameters(mesh):
@@ -580,10 +580,30 @@ def calculate_statistics_trimesh(mesh_file_path, repair=True):
             # Extract the minimum and maximum points of the bounding box
             min_point = bounding_box[0]
             max_point = bounding_box[1]
-            # Calculate the dimensions
+
+            # Vertices of the bounding box
+            vertices = np.array([
+                [min_point[0], min_point[1]],
+                [min_point[0], max_point[1]],
+                [max_point[0], min_point[1]],
+                [max_point[0], max_point[1]]
+            ])
+
+            # Calculate all pairwise distances in the XY plane
+            pairwise_distances = []
+            for i in range(len(vertices)):
+                for j in range(i + 1, len(vertices)):
+                    distance = np.linalg.norm(vertices[i] - vertices[j])
+                    pairwise_distances.append(distance)
+
+            # Identify the shortest and longest distances
+            width = min(pairwise_distances)
+            length = max(pairwise_distances)
+
+            # Calculate the height
             height = max_point[2] - min_point[2]
-            width = min(max_point[0] - min_point[0], max_point[1] - min_point[1])
-            length = max(max_point[0] - min_point[0], max_point[1] - min_point[1])
+
+            # Calculate volumes and areas
             bounding_box_volume = length * width * height
             bounding_box_xy_area = width * length
 
