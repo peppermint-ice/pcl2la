@@ -46,3 +46,34 @@ for approach in approaches:
                     print('TypeError: something is not good')
 simples.to_csv('C:/Users/dusen/Documents/PhD/plys/data/combined/o3d_simples.csv')
 
+import os
+import pandas as pd
+import leaf_area as la
+import re
+import sys
+from config import paths
+
+
+if __name__ == '__main__':
+    # Get command line arguments
+    approach = sys.argv[1]
+    value = sys.argv[2]
+
+    folder_paths = paths.get_paths()
+    folder_path = folder_paths["meshes"]
+    approach_folder_path = os.path.join(folder_path, approach)
+    value_folder_path = os.path.join(approach_folder_path, value)
+    print('folders set')
+    print(approach_folder_path)
+    print(value_folder_path)
+
+    # Check if the value_folder_path is a directory
+    if os.path.isdir(value_folder_path):
+        data = []
+
+        for ply in os.listdir(value_folder_path):
+            print('start analysis')
+            try:
+                # Run analysis
+                ply_path = os.path.join(value_folder_path, ply)
+                print(ply_path)
