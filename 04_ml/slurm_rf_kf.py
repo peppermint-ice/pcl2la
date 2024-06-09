@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import sys
+import re
 
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
@@ -17,19 +18,29 @@ if __name__ == '__main__':
     file_path = sys.argv[1]
 
     folder_paths = paths.get_paths()
-    csv_folder_path = folder_paths["ml_results"]
+    csv_folder_path = folder_paths["results"]
 
     # Read the CSV file specified by the command-line argument
     df = pd.read_csv(file_path)
-    df = df[df['Components_number'] != 0]
-    parameter_value = df['Parameter_value'].unique()[0]
-    parameter_type = df['Parameter_name'].unique()[0]
-    print(df['Parameter_name'].unique())
+
+    # Regular expression pattern
+    pattern = r'^([a-zA-Z0-9_]+)_([0-9.]+)_([a-zA-Z0-9_]+)_([a-zA-Z0-9_]+)_(.*)\.csv$'
+    file_name = os.path.basename(file_path)
+    match = re.match(pattern, file_name)
+    parameter_name = match.groups()[0]
+    parameter_value = match.groups()[1]
+    assessment_name = match.groups()[2]
+    repaired = match.groups()[3]
+    eliminated = match.groups()[4]
+
 
 
     keys = [
         'Parameter_name',
         'Parameter_value',
+        'Assessment_name',
+        'Repaired'
+        'Eliminated',
         'Regression_model',
         'RMSE_score_calibration',
         'RMSE_score_validation',
@@ -56,13 +67,11 @@ if __name__ == '__main__':
         # Iterate through each fold
         for i, (train_index, test_index) in enumerate(kf.split(df)):
             X_train, X_test = (df.drop(
-                columns=['Measured_leaf_area', 'File_name', 'parameter_type', 'parameter_value', 'Year', 'Elongation',
-                         'Flatness', 'Sphericity', 'Compactness'],
+                columns=['measured_leaf_area'],
                 inplace=False, axis=1).iloc[train_index],
-                               df.drop(columns=['Measured_leaf_area', 'File_name', 'parameter_type', 'parameter_value',
-                                                'Year', 'Elongation', 'Flatness', 'Sphericity', 'Compactness'],
+                               df.drop(columns=['measured_leaf_area'],
                                        inplace=False, axis=1).iloc[test_index])
-            y_train, y_test = df['Measured_leaf_area'].iloc[train_index], df['Measured_leaf_area'].iloc[test_index]
+            y_train, y_test = df['measured_leaf_area'].iloc[train_index], df['measured_leaf_area'].iloc[test_index]
 
             # Perform random search with cross-validation
             random_search = RandomizedSearchCV(RandomForestRegressor(), param_distributions=param_dist, n_iter=100, cv=5,
@@ -91,8 +100,11 @@ if __name__ == '__main__':
             # print('')
 
             current_results = {
-                'Parameter_name': df['parameter_type'].unique()[0],
-                'Parameter_value': df['parameter_value'].unique()[0],
+                'Parameter_name': parameter_name,
+                'Parameter_value': parameter_value,
+                'Assessment_name': assessment_name,
+                'Repaired': repaired,
+                'Eliminated': eliminated,
                 'Regression_model': 'Random_forest',
                 'K_fold': i,
                 'RMSE_score_calibration': mse_cal,
@@ -103,7 +115,7 @@ if __name__ == '__main__':
                 'Successful_reconstructions_train': len(X_train)
             }
             results_rf = pd.concat([results_rf, pd.DataFrame([current_results])], ignore_index=True)
-            output_file = str(parameter_value) + parameter_type + '_results_kf_rf.csv'
+            output_file = str(parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + '_results_kf_rf.csv'
             output_file_path = os.path.join(csv_folder_path, output_file)
             print(results_rf.shape)
     except ValueError:
