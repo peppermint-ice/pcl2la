@@ -24,7 +24,7 @@ from config import paths
 #         print(match.groups()[4])
 
 folder_paths = paths.get_paths()
-folder_path = paths["ready_for_training"]
+folder_path = folder_paths["ready_for_training"]
 for filename in os.listdir(folder_path):
     if filename.endswith(".csv"):
         # Construct the full file path
