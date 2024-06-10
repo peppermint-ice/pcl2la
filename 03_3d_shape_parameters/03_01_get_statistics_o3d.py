@@ -54,8 +54,8 @@ if __name__ == '__main__':
             except TypeError:
                 print('TypeError: something is not good')
 
-        # Convert data to DataFrame and transpose it
-        df = pd.DataFrame(data).transpose()
+        # Convert data to DataFrame
+        df = pd.DataFrame(data)
 
         # Save the transposed DataFrame to CSV
         csv_folder_path = folder_paths["ready_for_training"]
