@@ -17,6 +17,7 @@ if __name__ == '__main__':
     value_folder_path = os.path.join(approach_folder_path, value)
     print('trimesh')
     print('folders set')
+    print(folder_path)
     print(approach_folder_path)
     print(value_folder_path)
 
