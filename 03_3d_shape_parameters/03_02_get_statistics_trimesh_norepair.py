@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # Check if the value_folder_path is a directory
     if os.path.isdir(value_folder_path):
-        data = []
+        simples_data = []
 
         for ply in os.listdir(value_folder_path):
             print('start analysis')
@@ -39,17 +39,17 @@ if __name__ == '__main__':
                     print('Measured leaf area:', measured_leaf_area)
                     stats['measured_leaf_area'] = measured_leaf_area
 
-                    data.append(stats)
+                    simples_data.append(stats)
                     print("")
             except TypeError:
                 print('TypeError: something is not good')
 
-        # Convert data to DataFrame and transpose it
-        df = pd.DataFrame(data).transpose()
+        # Convert data to DataFrame
+        simples_df = pd.DataFrame(simples_data)
 
-        # Save the transposed DataFrame to CSV
+        # Save the DataFrames to CSV
         csv_folder_path = folder_paths["ready_for_training"]
-        simples_file_name = approach + "_" + value + "_trimesh_simple.csv"
+        simples_file_name = approach + "_" + value + "_trimesh_simple_noElim.csv"
         simples_path = os.path.join(csv_folder_path, simples_file_name)
-        df.to_csv(simples_path, index=False)
+        simples_df.to_csv(simples_path, index=False)
         print("Files saved here: ", simples_path)

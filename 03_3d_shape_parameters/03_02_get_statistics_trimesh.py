@@ -47,11 +47,11 @@ if __name__ == '__main__':
             except TypeError:
                 print('TypeError: something is not good')
 
-        # Convert data to DataFrame and transpose it
+        # Convert data to DataFrame
         simples_df = pd.DataFrame(simples_data)
         repaired_df = pd.DataFrame(repaired_data)
 
-        # Save the transposed DataFrames to CSV
+        # Save the DataFrames to CSV
         csv_folder_path = folder_paths["ready_for_training"]
         simples_file_name = approach + "_" + value + "_trimesh_simple_noElim.csv"
         simples_path = os.path.join(csv_folder_path, simples_file_name)

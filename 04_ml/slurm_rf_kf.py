@@ -121,27 +121,28 @@ if __name__ == '__main__':
             results_rf = pd.concat([results_rf, pd.DataFrame([current_results])], ignore_index=True)
 
             # Save the model using pickle
-            model_filename = str(
-                parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_model_kf_rf_fold_" + str(
+            model_filename = parameter_name + "_" + str(
+                parameter_value) + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_model_kf_rf_fold_" + str(
                 i) + ".pkl"
             model_filepath = os.path.join(model_folder_path, model_filename)
             with open(model_filepath, 'wb') as f:
                 pickle.dump(model, f)
 
             # Save train and test datasets as CSV files
-            train_filename = str(
-                parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_train_kf_rf_fold_" + str(
+            train_filename = parameter_name + "_" + str(
+                parameter_value) + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_train_kf_rf_fold_" + str(
                 i) + ".csv"
             train_filepath = os.path.join(train_folder_path, train_filename)
             X_train.to_csv(train_filepath, index=False)
 
-            test_filename = str(
-                parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_test_kf_rf_fold_" + str(
+            test_filename = parameter_name + "_" + str(
+                parameter_value) + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_test_kf_rf_fold_" + str(
                 i) + ".csv"
             test_filepath = os.path.join(test_folder_path, test_filename)
             X_test.to_csv(test_filepath, index=False)
 
-            output_file = str(parameter_value) + "_" + parameter_name + "_" + assessment_name + "_" + repaired + "_" + eliminated + '_results_kf_rf' + '.csv'
+            output_file = parameter_name + "_" + str(
+                parameter_value) + "_" + assessment_name + "_" + repaired + "_" + eliminated + '_results_kf_rf' + '.csv'
             output_file_path = os.path.join(csv_folder_path, output_file)
             print(results_rf.shape)
     except ValueError:
