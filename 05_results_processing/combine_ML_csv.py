@@ -7,7 +7,7 @@ folder_paths = paths.get_paths()
 
 # Set folder
 csv_folder_path = folder_paths["results"]
-csv_export_path = os.path.join(folder_paths["combined"], "combine_ML8_kf.csv")
+csv_export_path = os.path.join(folder_paths["combined"], "combine_ML9K_kf.csv")
 csvs = os.listdir(csv_folder_path)
 
 df = pd.DataFrame()
