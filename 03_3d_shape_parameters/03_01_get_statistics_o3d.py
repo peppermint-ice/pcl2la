@@ -17,6 +17,7 @@ if __name__ == '__main__':
     pcl_folder_path = folder_paths["corrected"]
     approach_folder_path = os.path.join(meshes_folder_path, approach)
     value_folder_path = os.path.join(approach_folder_path, value)
+    print('o3d')
     print('folders set')
     print(approach_folder_path)
     print(value_folder_path)

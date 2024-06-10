@@ -15,6 +15,7 @@ if __name__ == '__main__':
     folder_path = folder_paths["meshes"]
     approach_folder_path = os.path.join(folder_path, approach)
     value_folder_path = os.path.join(approach_folder_path, value)
+    print('trimesh')
     print('folders set')
     print(approach_folder_path)
     print(value_folder_path)
