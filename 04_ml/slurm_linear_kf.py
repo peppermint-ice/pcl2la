@@ -52,7 +52,7 @@ if __name__ == '__main__':
     try:
         print('starting linear regression')
         # Initialize KFold cross-validator
-        num_splits = 5
+        num_splits = 4
         kf = KFold(n_splits=num_splits, shuffle=True, random_state=42)
 
         # Iterate through each fold
