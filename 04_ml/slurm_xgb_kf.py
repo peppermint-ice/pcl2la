@@ -128,13 +128,19 @@ if __name__ == '__main__':
                 parameter_value) + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_train_kf_xgb_fold_" + str(
                 i) + ".csv"
             train_filepath = os.path.join(train_folder_path, train_filename)
-            X_train.to_csv(train_filepath, index=False)
+
+            train_set = X_train.copy()
+            train_set['measured_leaf_area'] = y_train
+            train_set.to_csv(train_filepath, index=False)
 
             test_filename = parameter_name + "_" + str(
                 parameter_value) + "_" + assessment_name + "_" + repaired + "_" + eliminated + "_test_kf_xgb_fold_" + str(
                 i) + ".csv"
             test_filepath = os.path.join(test_folder_path, test_filename)
-            X_test.to_csv(test_filepath, index=False)
+
+            test_set = X_test.copy()
+            test_set['measured_leaf_area'] = y_test
+            test_set.to_csv(test_filepath, index=False)
 
             output_file = parameter_name + "_" + str(
                 parameter_value) + "_" + assessment_name + "_" + repaired + "_" + eliminated + '_results_kf_xgb' + '.csv'
