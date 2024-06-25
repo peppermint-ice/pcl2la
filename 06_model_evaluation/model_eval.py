@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 import numpy as np
 import seaborn as sns
+import statistics
 
 
 def plot_distributions(train_set, test_set, fold_num, before=True):
     plt.figure(figsize=(12, 6))
     plt.subplot(1, 2, 1)
-    sns.kdeplot(train_set['measured_leaf_area'], label='Train', shade=True)
-    sns.kdeplot(test_set['measured_leaf_area'], label='Test', shade=True)
+    sns.kdeplot(train_set['measured_leaf_area'], label='Train', fill=True)
+    sns.kdeplot(test_set['measured_leaf_area'], label='Test', fill=True)
     title = 'Before Elimination' if before else 'After Elimination'
     plt.title(f'Distribution of Measured Leaf Area Fold {fold_num} ({title})')
     plt.legend()
@@ -51,6 +52,21 @@ def plot_predictions(y_train, y_train_pred, y_test, y_test_pred, r2_train, r2_te
     plt.tight_layout()
     plt.show()
 
+    # Function to plot median predictions
+def plot_predictions_median(y_true, y_pred_median, set_type, r2_median):
+    print(f"{set_type} Set:")
+    print(f"Length of y_true: {len(y_true)}")
+    print(f"Length of y_pred_median: {len(y_pred_median)}")
+
+    plt.figure(figsize=(6, 6))
+    plt.scatter(y_true, y_pred_median, alpha=0.5)
+    plt.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'k--', lw=2)
+    plt.xlabel('Measured')
+    plt.ylabel('Predicted')
+    plt.title(f'{set_type} Set Median Predictions\nR2: {r2_median:.4f}')
+    plt.tight_layout()
+    plt.show()
+
 
 if __name__ == '__main__':
     folder_paths = paths.get_paths()
@@ -58,7 +74,7 @@ if __name__ == '__main__':
     train_folder_path = folder_paths["train_sets"]
     test_folder_path = folder_paths["test_sets"]
 
-    base_file_name = "marching_cubes_13_o3d_simple_elim"
+    base_file_name = "marching_cubes_13_o3d_simple_noElim"
 
     file_names = []
     for i in range(5):
@@ -100,6 +116,11 @@ if __name__ == '__main__':
     r2_train_scores = []
     r2_test_scores = []
     test_sets_after_elimination = []
+    y_train_all = []
+    y_train_pred_all = []
+    y_test_all = []
+    y_test_pred_all = []
+    aggregated_y_test_pred = []  # Aggregate predictions for all folds
 
     for i in range(4):
         model = models[i]
@@ -116,6 +137,13 @@ if __name__ == '__main__':
         dtest = xgb.DMatrix(X_test)
         y_train_pred = model.predict(dtrain)
         y_test_pred = model.predict(dtest)
+
+        # Collect all train and test predictions
+        y_train_all.extend(y_train)
+        y_train_pred_all.extend(y_train_pred)
+        y_test_all.extend(y_test)
+        y_test_pred_all.extend(y_test_pred)
+        aggregated_y_test_pred.extend(y_test_pred)  # Aggregate predictions
 
         # Calculate R2 scores before elimination
         r2_train = r2_score(y_train, y_train_pred)
@@ -154,22 +182,16 @@ if __name__ == '__main__':
         # Plot distributions after elimination
         plot_distributions(train_set, test_set_filtered, i + 1, before=False)
 
-    # Calculate mean and median R2 scores before and after elimination
-    mean_r2_train = np.mean(r2_train_scores)
-    median_r2_train = np.median(r2_train_scores)
-    mean_r2_test = np.mean(r2_test_scores)
-    median_r2_test = np.median(r2_test_scores)
+    # Calculate R2 score for aggregated predictions
+    r2_aggregated = r2_score(y_test_all, aggregated_y_test_pred)
 
-    print(f"Mean R2 score for Train sets: {mean_r2_train}")
-    print(f"Median R2 score for Train sets: {median_r2_train}")
-    print(f"Mean R2 score for Test sets before elimination: {mean_r2_test}")
-    print(f"Median R2 score for Test sets before elimination: {median_r2_test}")
-
-    r2_test_scores_after_elimination = [r2_score(test_set['measured_leaf_area'], model.predict(
-        xgb.DMatrix(test_set.drop('measured_leaf_area', axis=1)))) for test_set in test_sets_after_elimination]
-
-    mean_r2_test_after = np.mean(r2_test_scores_after_elimination)
-    median_r2_test_after = np.median(r2_test_scores_after_elimination)
-
-    print(f"Mean R2 score for Test sets after elimination: {mean_r2_test_after}")
-    print(f"Median R2 score for Test sets after elimination: {median_r2_test_after}")
+    # Plot aggregated predictions against true values
+    plt.figure(figsize=(8, 6))
+    plt.scatter(y_test_all, aggregated_y_test_pred, alpha=0.5)
+    plt.plot([min(y_test_all), max(y_test_all)], [min(aggregated_y_test_pred), max(aggregated_y_test_pred)], 'k--',
+             lw=2)
+    plt.xlabel('Measured')
+    plt.ylabel('Predicted')
+    plt.title(f'Aggregated Predictions vs True Values\nR2: {r2_aggregated:.4f}')
+    plt.tight_layout()
+    plt.show()
