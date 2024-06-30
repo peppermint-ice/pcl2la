@@ -40,7 +40,9 @@ def get_paths():
         "ready_for_training_2": os.path.join(config[hostname]["plys"], "data/ready_for_training_2"),
         "models": os.path.join(config[hostname]["plys"], "data/models"),
         "train_sets": os.path.join(config[hostname]["plys"], "data/train_sets"),
-        "test_sets": os.path.join(config[hostname]["plys"], "data/test_sets")
+        "test_sets": os.path.join(config[hostname]["plys"], "data/test_sets"),
+        "kfold_results": os.path.join(config[hostname]["plys"], "data/kfold_results"),
+        "global_test_sets": os.path.join(config[hostname]["plys"], "data/global_test_sets"),
     }
 
     return paths
