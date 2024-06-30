@@ -19,7 +19,7 @@ if __name__ == '__main__':
     kfold_results_path = folder_paths["kfold_results"]
     csv_folder_path = folder_paths["results"]
     model_folder_path = folder_paths["models"]
-    train_folder_path = folder_paths["training_sets"]
+    train_folder_path = folder_paths["train_sets"]
     test_folder_path = folder_paths["test_sets"]
     global_test_path = folder_paths["global_test_sets"]
 
