@@ -58,7 +58,7 @@ if __name__ == '__main__':
         print('starting grid search')
 
         # Stratified split for train and test sets
-        stratified_splitter = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='uniform')
+        stratified_splitter = KBinsDiscretizer(n_bins=5, encode='ordinal', strategy='uniform')
         df['leaf_area_bin'] = stratified_splitter.fit_transform(df[['measured_leaf_area']])
         train_df, test_df = train_test_split(df, test_size=0.3, stratify=df['leaf_area_bin'], random_state=42)
         train_df = train_df.drop(columns=['leaf_area_bin'])
