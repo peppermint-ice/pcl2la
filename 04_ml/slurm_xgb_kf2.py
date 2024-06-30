@@ -6,7 +6,7 @@ import re
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from scipy.stats import randint, uniform
-from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold, train_test_split
+from sklearn.model_selection import RandomizedSearchCV, KFold, train_test_split
 from sklearn.preprocessing import KBinsDiscretizer
 import pickle
 from config import paths
@@ -49,7 +49,8 @@ if __name__ == '__main__':
         'R2_score_calibration',
         'R2_score_validation',
         'Successful_reconstructions_test',
-        'Successful_reconstructions_train']
+        'Successful_reconstructions_train'
+    ]
     current_results = dict.fromkeys(keys)
     results_xgb = pd.DataFrame()
 
@@ -76,21 +77,21 @@ if __name__ == '__main__':
 
         # Define distributions for hyperparameters
         param_dist = {
-            'n_estimators': randint(50, 200),
-            'max_depth': randint(3, 10),
-            'learning_rate': uniform(0.01, 0.3),
-            'min_child_weight': randint(1, 6)
+            'n_estimators': randint(50, 200),  # Number of boosting rounds
+            'max_depth': randint(3, 10),  # Maximum depth of the trees
+            'learning_rate': uniform(0.01, 0.3),  # Learning rate
+            'min_child_weight': randint(1, 6)  # Minimum sum of instance weight needed in a child
         }
 
-        # Initialize StratifiedKFold cross-validator
+        # Initialize KFold cross-validator
         num_splits = 6
-        skf = StratifiedKFold(n_splits=num_splits, shuffle=True, random_state=42)
+        kf = KFold(n_splits=num_splits, shuffle=True, random_state=42)
 
         best_fold_index = -1
         best_r2_val = float('-inf')
 
         # Iterate through each fold
-        for i, (train_index, val_index) in enumerate(skf.split(X_train, y_train)):
+        for i, (train_index, val_index) in enumerate(kf.split(X_train)):
             X_train_fold, X_val_fold = X_train.iloc[train_index], X_train.iloc[val_index]
             y_train_fold, y_val_fold = y_train.iloc[train_index], y_train.iloc[val_index]
 
