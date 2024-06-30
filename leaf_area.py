@@ -479,8 +479,9 @@ def calculate_watertight_volume(shape):
     return total_volume
 
 
-def calculate_shape_parameters(point_cloud_data_file, shape, total_volume):
-    point_cloud_array = np.asarray(point_cloud_data_file.points)
+def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
+    point_cloud = o3d.io.read_point_cloud(point_cloud_file_path)
+    point_cloud_array = np.asarray(point_cloud.points)
     # Get dimensions (length, width, height)
     dimensions = np.ptp(point_cloud_array, axis=0)
 
@@ -488,6 +489,7 @@ def calculate_shape_parameters(point_cloud_data_file, shape, total_volume):
     dimensions = dimensions[[1, 2, 0]]
 
     # Calculate surface area
+    shape = o3d.io.read_triangle_mesh(mesh)
     surface_area = shape.get_surface_area()
 
     # Calculate aspect ratio
