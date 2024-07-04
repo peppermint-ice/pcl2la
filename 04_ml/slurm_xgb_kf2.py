@@ -60,7 +60,7 @@ if __name__ == '__main__':
         # Stratified split for train and test sets
         stratified_splitter = KBinsDiscretizer(n_bins=5, encode='ordinal', strategy='uniform')
         df['leaf_area_bin'] = stratified_splitter.fit_transform(df[['measured_leaf_area']])
-        train_df, test_df = train_test_split(df, test_size=0.3, stratify=df['leaf_area_bin'], random_state=42)
+        train_df, test_df = train_test_split(df, test_size=0.3, stratify=df['leaf_area_bin'])
         train_df = train_df.drop(columns=['leaf_area_bin'])
         test_df = test_df.drop(columns=['leaf_area_bin'])
 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
         # Initialize KFold cross-validator
         num_splits = 6
-        kf = KFold(n_splits=num_splits, shuffle=True, random_state=42)
+        kf = KFold(n_splits=num_splits, shuffle=True)
 
         best_fold_index = -1
         best_r2_val = float('-inf')
