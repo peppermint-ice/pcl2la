@@ -34,7 +34,6 @@ if __name__ == '__main__':
                 pcl_file_path = os.path.join(pcl_folder_path, ply)
                 ply_path = os.path.join(value_folder_path, ply)
 
-                pcl = o3d.io.read_point_cloud(pcl_file_path)
                 mesh = o3d.io.read_triangle_mesh(ply_path)
                 print('files read successfully')
 
@@ -42,7 +41,7 @@ if __name__ == '__main__':
                 total_volume = la.calculate_watertight_volume(mesh)
                 print('volume calculated')
                 print('calculating stats')
-                stats = la.calculate_shape_parameters(pcl, mesh, total_volume)
+                stats = la.calculate_shape_parameters(pcl_file_path, mesh, total_volume)
                 print('stats calculated')
 
                 # Add LA and year from file name to the analysis results
