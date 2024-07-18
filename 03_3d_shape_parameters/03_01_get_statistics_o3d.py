@@ -41,7 +41,7 @@ if __name__ == '__main__':
                 total_volume = la.calculate_watertight_volume(mesh)
                 print('volume calculated')
                 print('calculating stats')
-                stats = la.calculate_shape_parameters(pcl_file_path, mesh, total_volume)
+                stats = la.calculate_shape_parameters(pcl_file_path, ply_path, total_volume)
                 print('stats calculated')
 
                 # Add LA and year from file name to the analysis results
