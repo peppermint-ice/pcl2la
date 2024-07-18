@@ -474,48 +474,50 @@ def calculate_watertight_volume(shape):
     total_volume = 0
     for i in mesh.split():
         if i.is_watertight:
-            print(i.volume)
+            # print(i.volume)
             total_volume += abs(i.volume)
+    print('Total volume of watertight triangles: {}'.format(total_volume))
     return total_volume
 
 
 def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
     point_cloud = o3d.io.read_point_cloud(point_cloud_file_path)
     point_cloud_array = np.asarray(point_cloud.points)
+    print('files loaded')
     # Get dimensions (length, width, height)
     dimensions = np.ptp(point_cloud_array, axis=0)
-
+    print('dimensions calculated')
     # Swap dimensions for height, length, and width
     dimensions = dimensions[[1, 2, 0]]
 
     # Calculate surface area
     shape = o3d.io.read_triangle_mesh(mesh)
     surface_area = shape.get_surface_area()
-
+    print('surface area calculated')
     # Calculate aspect ratio
     try:
         aspect_ratio = np.max(dimensions) / np.min(dimensions)
     except ZeroDivisionError:
         print("Can't calculate aspect ratio. Division by zero. Aspect Ratio set to 0")
         aspect_ratio = 0
-
-    # Calculate elongation
-    try:
-        elongation = (np.max(dimensions) / np.median(dimensions)) - 1
-    except ZeroDivisionError:
-        print("Can't calculate elongation. Division by zero.")
-        elongation = 0
-
-    # Calculate flatness
-    try:
-        flatness = (np.min(dimensions) / np.median(dimensions)) - 1
-    except ZeroDivisionError:
-        print("Can't calculate flatness. Division by zero.")
-        flatness = 0
-
+    print('aspect ratio calculated')
+    # # Calculate elongation
+    # try:
+    #     elongation = (np.max(dimensions) / np.median(dimensions)) - 1
+    # except ZeroDivisionError:
+    #     print("Can't calculate elongation. Division by zero.")
+    #     elongation = 0
+    # print('elongation calculated')
+    # # Calculate flatness
+    # try:
+    #     flatness = (np.min(dimensions) / np.median(dimensions)) - 1
+    # except ZeroDivisionError:
+    #     print("Can't calculate flatness. Division by zero.")
+    #     flatness = 0
+    # print('flatness calculated')
     # Get connected components
     connected_components = shape.cluster_connected_triangles()
-
+    print('connected components calculated')
     # Initialize a dictionary to store parameters for each component
     component_parameters = {}
 
@@ -525,14 +527,14 @@ def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
     except ZeroDivisionError:
         print("Can't calculate sphericity. Division by zero.")
         sphericity = 0
-
+    print('sphericity calculated')
     # Calculate compactness for the entire alpha shape
     try:
         compactness = (36 * np.pi * total_volume ** 2) ** (1 / 3) / surface_area
     except ZeroDivisionError:
         print("Can't calculate compactness. Division by zero.")
         compactness = 0
-
+    print('compactness calculated')
     # Calculate number of independent components
     vertices = np.asarray(shape.vertices)
     triangles = np.asarray(shape.triangles)
@@ -540,7 +542,7 @@ def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
     components = 0
     for i in mesh.split():
         components += 1
-
+    print('components calculated')
     # # Get points inside the alpha shape
     # points_inside = shape.select_by_index(np.arange(len(point_cloud)))
 
@@ -551,7 +553,7 @@ def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
     except ZeroDivisionError:
         print("Can't calculate point density. Division by zero.")
         point_density = 0
-
+    print('point density calculated')
     # Store parameters for the entire alpha shape
     parameters = {
         'height': dimensions[0],

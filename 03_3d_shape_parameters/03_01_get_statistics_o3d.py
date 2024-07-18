@@ -40,6 +40,7 @@ if __name__ == '__main__':
                 # Run the analysis
                 total_volume = la.calculate_watertight_volume(mesh)
                 print('volume calculated')
+                print('calculating stats')
                 stats = la.calculate_shape_parameters(pcl, mesh, total_volume)
                 print('stats calculated')
 
