@@ -35,10 +35,13 @@ if __name__ == '__main__':
 
                 pcl = o3d.io.read_point_cloud(pcl_file_path)
                 mesh = o3d.io.read_triangle_mesh(ply_path)
+                print('files read successfully')
 
                 # Run the analysis
                 total_volume = la.calculate_watertight_volume(mesh)
+                print('volume calculated')
                 stats = la.calculate_shape_parameters(pcl, mesh, total_volume)
+                print('stats calculated')
 
                 # Add LA and year from file name to the analysis results
                 # Pattern: (date)_(everythingelse)_(LA).ply
@@ -55,6 +58,7 @@ if __name__ == '__main__':
                         stats['experiment_number'] = 2
 
                     data.append(stats)
+                    print("info retrieved from file name")
                     print("")
             except TypeError:
                 print('TypeError: something is not good')
