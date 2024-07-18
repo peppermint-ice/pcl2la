@@ -226,13 +226,6 @@ if __name__ == '__main__':
     else:
         r2_aggregated = r2_score(y_test_all, y_test_pred_all)
 
-    # Save the aggregated predictions and corresponding measured values to a CSV file
-    df_results = pd.DataFrame({
-        'Measured': y_test_all,
-        'Predicted': y_test_pred_all
-    })
-    df_results.to_csv('values.csv', index=False)
-
     # Plot distributions for the aggregated data
     plot_aggregated_distributions(y_train_all, y_test_all, min_limit, max_limit)
 

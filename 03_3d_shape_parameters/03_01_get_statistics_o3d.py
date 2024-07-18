@@ -40,14 +40,19 @@ if __name__ == '__main__':
                 total_volume = la.calculate_watertight_volume(mesh)
                 stats = la.calculate_shape_parameters(pcl, mesh, total_volume)
 
-                # Add data about the files to the analysis results
-                #       1. Get measured leaf area data
-                match = re.search(r'(\d+p\d+\.)', ply)
-                #       2. Add parameters to the file
+                # Add LA and year from file name to the analysis results
+                # Pattern: (date)_(everythingelse)_(LA).ply
+                pattern = r'(\d*)_(\w*)_(\d*p?\d*)\.ply'
+                match = re.search(pattern, ply)
+                #       Get measured leaf area and year data. Add parameters to the file
                 if match:
-                    measured_leaf_area = float(match.group().replace('p', '.')[:-1])
+                    measured_leaf_area = float(match.group(3).replace('p', '.'))
                     print('Measured leaf area:', measured_leaf_area)
                     stats['measured_leaf_area'] = measured_leaf_area
+                    if match.group(1).endswith("23"):
+                        stats['experiment_number'] = 1
+                    elif match.group(1).endswith("24"):
+                        stats['experiment_number'] = 2
 
                     data.append(stats)
                     print("")

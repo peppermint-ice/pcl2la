@@ -38,11 +38,17 @@ def get_paths():
         "combined": os.path.join(config[hostname]["plys"], "data/combined"),
         "ready_for_training": os.path.join(config[hostname]["plys"], "data/ready_for_training"),
         "ready_for_training_2": os.path.join(config[hostname]["plys"], "data/ready_for_training_2"),
+        "ready_for_training_elim_ind": os.path.join(config[hostname]["plys"], "data/ready_for_training_elim_ind"),
+        "ready_for_training_elim_all": os.path.join(config[hostname]["plys"], "data/ready_for_training_elim_all"),
         "models": os.path.join(config[hostname]["plys"], "data/models"),
         "train_sets": os.path.join(config[hostname]["plys"], "data/train_sets"),
         "test_sets": os.path.join(config[hostname]["plys"], "data/test_sets"),
         "kfold_results": os.path.join(config[hostname]["plys"], "data/kfold_results"),
         "global_test_sets": os.path.join(config[hostname]["plys"], "data/global_test_sets"),
+        "plots": os.path.join(config[hostname]["plys"], "data/plots"),
+        "prediction_plots": os.path.join(config[hostname]["plys"], "data/plots/prediction_plots"),
+        "pca_plots": os.path.join(config[hostname]["plys"], "data/plots/pca_plots"),
+        "feature_importance_plots": os.path.join(config[hostname]["plys"], "data/plots/feature_importance_plots"),
     }
 
     return paths

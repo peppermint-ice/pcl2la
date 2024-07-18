@@ -49,6 +49,7 @@ print("Model loaded")
 global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_global_test_set.csv"
 global_test_set_file_path = os.path.join(global_test_sets_path, global_test_set_file_name)
 global_test_df = pd.read_csv(global_test_set_file_path)
+print(len(global_test_df))
 
 # Extract features and target
 X_test = global_test_df.drop(columns=['measured_leaf_area'])
@@ -78,43 +79,44 @@ print(f"Mean Absolute Percentage Error (MAPE): {mape}")
 print(f"Median Absolute Error: {median_ae}")
 print(f"Explained Variance Score: {evs}")
 
-# Determine parameter label based on algorithm name
-parameter_labels = {
-    "marching_cubes": "Threshold value",
-    "alpha": "Alpha value",
-    "ball_pivoting": "Smallest ball radius",
-    "poisson": "Depth"
-}
-
-parameter_label = parameter_labels.get(algorithm_name, "Parameter value")
+# Function to format text
+def format_text(text):
+    return text.replace('_', ' ').title()
 
 # Format algorithm_name and parameter_value for display
-formatted_algorithm_name = algorithm_name.replace('_', ' ').title()
-formatted_parameter_value = f"{parameter_label}: {parameter_value.replace('_', ' ')}"
+formatted_algorithm_name = format_text(algorithm_name)
+formatted_parameter_value = format_text(parameter_value)
+
+parameter_value_type = {
+    'marching_cubes': 'Threshold',
+    'poisson': 'Depth',
+    'alpha': 'Alpha Value',
+    'ball_pivoting': 'Smallest Ball Radius'
+}
 
 # Plot actual vs. predicted values with a 1:1 line and metrics
 plt.figure(figsize=(10, 10))
 plt.scatter(y_test, y_pred, alpha=0.3)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
-plt.xlabel('Measured leaf area, cm²')
-plt.ylabel('Predicted leaf area, cm²')
-plt.title('Actual vs. Predicted Measured Leaf Area')
+plt.xlabel('Measured Leaf Area, Cm²')
+plt.ylabel('Predicted Leaf Area, Cm²')
+plt.title('Actual Vs. Predicted Measured Leaf Area')
 plt.axis('square')
 plt.xlim([min(y_test.min(), y_pred.min()), max(y_test.max(), y_pred.max())])
 plt.ylim([min(y_test.min(), y_pred.min()), max(y_test.max(), y_pred.max())])
 plt.text(0.05, 0.95, f'R² = {r2:.2f}\nRMSE = {rmse:.2f}', transform=plt.gca().transAxes,
          fontsize=12, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
-plt.text(0.05, 0.85, f'{formatted_algorithm_name}\n{formatted_parameter_value}', transform=plt.gca().transAxes,
+plt.text(0.05, 0.85, f'3D Reconstruction Algorithm: {formatted_algorithm_name}\n{parameter_value_type[algorithm_name]} Value: {formatted_parameter_value}', transform=plt.gca().transAxes,
          fontsize=12, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 plt.show()
 
 # Plot feature importance
 importance = model.get_score(importance_type='weight')
 importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
-features = [item[0] for item in importance]
+features = [format_text(item[0]) for item in importance]
 scores = [item[1] for item in importance]
 
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(12, 6))
 plt.barh(features, scores)
 plt.xlabel('Importance Score')
 plt.title('Feature Importance')
@@ -127,10 +129,10 @@ principal_components = pca.fit_transform(X_test)
 pca_df = pd.DataFrame(data=principal_components, columns=['Principal Component 1', 'Principal Component 2'])
 pca_df['measured_leaf_area'] = y_test.values
 
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(12, 6))
 plt.scatter(pca_df['Principal Component 1'], pca_df['Principal Component 2'], c=pca_df['measured_leaf_area'], cmap='viridis', alpha=0.6)
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Test Set')
-plt.colorbar(label='measured_leaf_area')
+plt.title('Pca Of Test Set')
+plt.colorbar(label='Measured Leaf Area')
 plt.show()
