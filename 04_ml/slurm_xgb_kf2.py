@@ -70,9 +70,9 @@ if __name__ == '__main__':
         test_df.to_csv(global_test_filepath, index=False)
 
         # Prepare training and test data
-        X_train = train_df.drop(columns=['measured_leaf_area'])
+        X_train = train_df.drop(columns=['measured_leaf_area', 'experiment_number'])
         y_train = train_df['measured_leaf_area']
-        X_test = test_df.drop(columns=['measured_leaf_area'])
+        X_test = test_df.drop(columns=['measured_leaf_area', 'experiment_number'])
         y_test = test_df['measured_leaf_area']
 
         # Define distributions for hyperparameters
