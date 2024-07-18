@@ -5,6 +5,7 @@ import re
 import open3d as o3d
 import sys
 from config import paths
+import traceback
 
 
 if __name__ == '__main__':
@@ -63,6 +64,7 @@ if __name__ == '__main__':
                     print("")
             except TypeError:
                 print('TypeError: something is not good')
+                traceback.print_exc()
 
         # Convert data to DataFrame
         df = pd.DataFrame(data)
