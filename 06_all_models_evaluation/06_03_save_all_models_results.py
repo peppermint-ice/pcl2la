@@ -83,7 +83,7 @@ if __name__ == '__main__':
                         test_file_names.append(f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_val_kf_{regression_model}_fold_{i}.csv")
                         train_file_names.append(f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_train_kf_{regression_model}_fold_{i}.csv")
                     # Define global test set file name
-                    global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_global_test_set.csv"
+                    global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_{regression_model}_global_test_set.csv"
                     # Define files paths
                     # Model file path is different for rf and xgb because the XGBoost needs to load a json
                     if regression_model == "xgb":
@@ -169,8 +169,7 @@ if __name__ == '__main__':
                     # Save the results
                     # Append results to the list
                     result = (model_parameters + r2_training + r2_testing +
-                              [mean_r2_training, mean_r2_testing, r2_global_test, rmse_global_test] +
-                              [train_set_length, test_set_length])
+                              [mean_r2_training, mean_r2_testing, r2_global_test, rmse_global_test])
                     results.append(result)
                     print("")
 
@@ -193,10 +192,6 @@ if __name__ == '__main__':
                    "mean_R2_testing",
                    "R2_global_test",
                    "RMSE_global_test"
-               ] +
-               [
-                   "train_set_length",
-                   "test_set_length"
                ])
     results_df = pd.DataFrame(results, columns=columns)
     results_df.to_csv(os.path.join(folder_paths["combined"], f"combine_ML_{current_time}.csv"), index=False)

@@ -61,7 +61,7 @@ if __name__ == '__main__':
         test_df = df[df['experiment_number'] == 2].drop(columns=['experiment_number'])
 
         # Save the global test set
-        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_global_test_set.csv"
+        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_xgb_global_test_set.csv"
         global_test_filepath = os.path.join(global_test_path, global_test_filename)
         test_df.to_csv(global_test_filepath, index=False)
 

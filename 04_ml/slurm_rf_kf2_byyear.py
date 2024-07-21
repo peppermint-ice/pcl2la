@@ -57,12 +57,14 @@ if __name__ == '__main__':
     try:
         print('starting grid search')
         # Split dataset into train and test using 'experiment_number' value. 2023 for exp 1, 2024 for exp 2
-        train_df = df[df['experiment_number'] == 1].drop(columns=['experiment_number'])
-        test_df = df[df['experiment_number'] == 2].drop(columns=['experiment_number'])
+        train_df = df[df['experiment_number'] == 1]
+        train_df.drop(columns=['experiment_number'], inplace=True)
+        test_df = df[df['experiment_number'] == 2]
+        test_df.drop(columns=['experiment_number'], inplace=True)
 
 
         # Save the global test set
-        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_global_test_set.csv"
+        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_rf_global_test_set.csv"
         global_test_filepath = os.path.join(global_test_path, global_test_filename)
         test_df.to_csv(global_test_filepath, index=False)
 
