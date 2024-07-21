@@ -56,13 +56,10 @@ if __name__ == '__main__':
 
     try:
         print('starting grid search')
+        # Split dataset into train and test using 'experiment_number' value. 2023 for exp 1, 2024 for exp 2
+        train_df = df[df['experiment_number'] == 1].drop(columns=['experiment_number'])
+        test_df = df[df['experiment_number'] == 2].drop(columns=['experiment_number'])
 
-        # Stratified split for train and test sets
-        stratified_splitter = KBinsDiscretizer(n_bins=5, encode='ordinal', strategy='uniform')
-        df['leaf_area_bin'] = stratified_splitter.fit_transform(df[['measured_leaf_area']])
-        train_df, test_df = train_test_split(df, test_size=0.3, stratify=df['leaf_area_bin'])
-        train_df = train_df.drop(columns=['leaf_area_bin'])
-        test_df = test_df.drop(columns=['leaf_area_bin'])
 
         # Save the global test set
         global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_global_test_set.csv"

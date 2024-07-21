@@ -112,12 +112,12 @@ if __name__ == '__main__':
                     print("Files loaded")
                     print(train_file_paths)
 
-                    # Get lengths of test and train sets
-                    test_set_length = len(global_test_df)
-                    for train_set in train_dfs:
-                        all_data = pd.concat([train_set], ignore_index=True)
-
-                    train_set_length += len(train_set)
+                    # # Get lengths of test and train sets
+                    # test_set_length = len(global_test_df)
+                    # for train_set in train_dfs:
+                    #     all_data = pd.concat([train_set], ignore_index=True)
+                    #
+                    # train_set_length += len(train_set)
 
                     # GLOBAL TEST
                     print("Global test")
