@@ -49,6 +49,7 @@ def get_paths():
         "prediction_plots": os.path.join(config[hostname]["plys"], "data/plots/prediction_plots"),
         "pca_plots": os.path.join(config[hostname]["plys"], "data/plots/pca_plots"),
         "feature_importance_plots": os.path.join(config[hostname]["plys"], "data/plots/feature_importance_plots"),
+        "scalers": os.path.join(config[hostname]["plys"], "data/scalers"),
     }
 
     return paths
