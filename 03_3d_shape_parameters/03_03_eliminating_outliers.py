@@ -7,6 +7,7 @@ if __name__ == '__main__':
     folder_paths = paths.get_paths()
     csv_folder_path = folder_paths["ready_for_training"]
 
+
     # Process each CSV file in the folder
     for filename in os.listdir(csv_folder_path):
         if filename.endswith("_noElim.csv"):

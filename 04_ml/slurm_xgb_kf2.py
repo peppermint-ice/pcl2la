@@ -4,10 +4,13 @@ import sys
 import re
 
 from xgboost import XGBRegressor
+from boruta import BorutaPy
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from scipy.stats import randint, uniform
 from sklearn.model_selection import RandomizedSearchCV, KFold, train_test_split
 from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.feature_selection import mutual_info_regression
 import pickle
 from config import paths
 
@@ -64,16 +67,37 @@ if __name__ == '__main__':
         train_df = train_df.drop(columns=['leaf_area_bin'])
         test_df = test_df.drop(columns=['leaf_area_bin'])
 
-        # Save the global test set
-        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_global_test_set.csv"
-        global_test_filepath = os.path.join(global_test_path, global_test_filename)
-        test_df.to_csv(global_test_filepath, index=False)
-
         # Prepare training and test data
         X_train = train_df.drop(columns=['measured_leaf_area', 'experiment_number'])
         y_train = train_df['measured_leaf_area']
         X_test = test_df.drop(columns=['measured_leaf_area', 'experiment_number'])
         y_test = test_df['measured_leaf_area']
+
+        # Feature selection using Mutual Information and Boruta
+        # Feature selection using Mutual Information
+        mi_scores = mutual_info_regression(X_train, y_train)
+        mi_scores = pd.Series(mi_scores, index=X_train.columns).sort_values(ascending=False)
+        selected_features_mi = mi_scores[mi_scores > 0.1].index  # Adjust the threshold as needed
+        X_train_mi = X_train[selected_features_mi]
+        X_test_mi = X_test[selected_features_mi]
+
+        # Further feature selection using Boruta
+        rf = RandomForestRegressor(n_jobs=-1, max_depth=5)
+        boruta_selector = BorutaPy(rf, n_estimators='auto', random_state=42)
+        boruta_selector.fit(X_train_mi.values, y_train.values)
+        selected_features_boruta = X_train_mi.columns[boruta_selector.support_]
+        X_train_boruta = X_train_mi[selected_features_boruta]
+        X_test_boruta = X_test_mi[selected_features_boruta]
+
+        # Save the global test set
+        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_xgb_global_test_set.csv"
+        global_test_filepath = os.path.join(global_test_path, global_test_filename)
+        test_selected = pd.concat([X_test_boruta, y_test.reset_index(drop=True)], axis=1)
+        test_selected.to_csv(global_test_filepath, index=False)
+
+        # Switch X_train/test into the cleaned ones
+        X_train = X_train_boruta
+        X_test = X_test_boruta
 
         # Define distributions for hyperparameters
         param_dist = {
