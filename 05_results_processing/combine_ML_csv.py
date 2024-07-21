@@ -7,7 +7,7 @@ folder_paths = paths.get_paths()
 
 # Set folder
 csv_folder_path = folder_paths["results"]
-csv_export_path = os.path.join(folder_paths["combined"], "combine_test_byyear.csv")
+csv_export_path = os.path.join(folder_paths["combined"], "combine_test_by_year.csv")
 csvs = os.listdir(csv_folder_path)
 print(csv_export_path)
 
