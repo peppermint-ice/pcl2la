@@ -16,7 +16,7 @@ if __name__ == '__main__':
             import_csv_path = os.path.join(csv_folder_path, filename)
             export_csv_path = os.path.join(csv_folder_path, filename.replace("_noElim.csv", "_elim.csv"))
             scaler = la.eliminate_outliers_and_scale(import_csv_path, export_csv_path)
-            scaler_name = filename.replace("_noElim.csv", "scaler.pkl")
+            scaler_name = filename.replace("noElim.csv", "scaler.pkl")
             scaler_export_path = os.path.join(scalers_folder_path, scaler_name)
             with open(scaler_export_path, 'wb') as f:
                 pickle.dump(scaler, f)
