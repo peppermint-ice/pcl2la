@@ -747,6 +747,7 @@ def eliminate_outliers_and_scale(file_path, export_path):
         scaled_df.to_csv(export_path, index=False)
     else:
         print("No data left after outlier removal. Exporting an empty DataFrame.")
+    return scaler
 
 if __name__ == '__main__':
     folders_paths = paths.get_paths()

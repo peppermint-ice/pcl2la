@@ -1,13 +1,15 @@
 from config import paths
 import os
 import pandas as pd
+from datetime import datetime
+
 
 # Get path
 folder_paths = paths.get_paths()
 
 # Set folder
 csv_folder_path = folder_paths["results"]
-csv_export_path = os.path.join(folder_paths["combined"], "combine_test_by_year.csv")
+
 csvs = os.listdir(csv_folder_path)
 print(csv_export_path)
 
@@ -20,4 +22,7 @@ for file in csvs:
 
         df = pd.concat([df, df_current], ignore_index=True)
 
+
+current_time = datetime.now().strftime("%d%m%y_%H%M")
+csv_export_path = os.path.join(folder_paths["combined"], f"combine_test_by_year_{current_time}.csv")
 df.to_csv(csv_export_path, index=False)
