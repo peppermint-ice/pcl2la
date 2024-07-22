@@ -140,7 +140,7 @@ if __name__ == '__main__':
                 'Assessment_name': assessment_name,
                 'Repaired': repaired,
                 'Eliminated': eliminated,
-                'Regression_model': 'Random_forest',
+                'Regression_model': 'Lasso',
                 'K_fold': i,
                 'RMSE_score_calibration': mse_train,
                 'RMSE_score_validation': mse_val,
@@ -187,7 +187,7 @@ if __name__ == '__main__':
             'Assessment_name': assessment_name,
             'Repaired': repaired,
             'Eliminated': eliminated,
-            'Regression_model': 'Random_forest',
+            'Regression_model': 'Lasso',
             'RMSE_score_test': mse_test,
             'R2_score_test': r2_test
         }
