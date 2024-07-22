@@ -3,6 +3,7 @@ import os
 import sys
 import re
 
+from sklearn.linear_model import Ridge
 from boruta import BorutaPy
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
@@ -58,16 +59,18 @@ if __name__ == '__main__':
 
     try:
         print('starting grid search')
-        # Split dataset into train and test using 'experiment_number' value. 2023 for exp 1, 2024 for exp 2
-        train_df = df[df['experiment_number'] == 1]
-        train_df.drop(columns=['experiment_number'], inplace=True)
-        test_df = df[df['experiment_number'] == 2]
-        test_df.drop(columns=['experiment_number'], inplace=True)
+
+        # Stratified split for train and test sets
+        stratified_splitter = KBinsDiscretizer(n_bins=5, encode='ordinal', strategy='uniform')
+        df['leaf_area_bin'] = stratified_splitter.fit_transform(df[['measured_leaf_area']])
+        train_df, test_df = train_test_split(df, test_size=0.3, stratify=df['leaf_area_bin'])
+        train_df = train_df.drop(columns=['leaf_area_bin'])
+        test_df = test_df.drop(columns=['leaf_area_bin'])
 
         # Prepare training and test data
-        X_train = train_df.drop(columns=['measured_leaf_area'])
+        X_train = train_df.drop(columns=['measured_leaf_area', 'experiment_number'])
         y_train = train_df['measured_leaf_area']
-        X_test = test_df.drop(columns=['measured_leaf_area'])
+        X_test = test_df.drop(columns=['measured_leaf_area', 'experiment_number'])
         y_test = test_df['measured_leaf_area']
 
         # Feature selection using Mutual Information and Boruta
@@ -87,7 +90,7 @@ if __name__ == '__main__':
         X_test_boruta = X_test_mi[selected_features_boruta]
 
         # Save the global test set
-        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_rf_global_test_set_byyear.csv"
+        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_ridge_global_test_set_noyear.csv"
         global_test_filepath = os.path.join(global_test_path, global_test_filename)
         test_selected = pd.concat([X_test_boruta, y_test.reset_index(drop=True)], axis=1)
         test_selected.to_csv(global_test_filepath, index=False)
@@ -98,12 +101,8 @@ if __name__ == '__main__':
 
         # Define distributions for hyperparameters
         param_dist = {
-            'n_estimators': randint(50, 200),  # Number of trees in the forest
-            'max_depth': [None] + list(randint(3, 10).rvs(5)),  # Maximum depth of the trees
-            'min_samples_split': randint(2, 20),  # Minimum number of samples required to split a node
-            'min_samples_leaf': randint(1, 10)  # Minimum number of samples required at each leaf node
+            'alpha': [0.001, 0.01, 0.1, 1, 10, 100]
         }
-
         # Initialize KFold cross-validator
         num_splits = 6
         kf = KFold(n_splits=num_splits, shuffle=True)
@@ -117,7 +116,7 @@ if __name__ == '__main__':
             y_train_fold, y_val_fold = y_train.iloc[train_index], y_train.iloc[val_index]
 
             # Perform random search with cross-validation
-            random_search = RandomizedSearchCV(RandomForestRegressor(), param_distributions=param_dist, n_iter=100,
+            random_search = RandomizedSearchCV(Ridge(), param_distributions=param_dist, n_iter=100,
                                                cv=5,
                                                scoring='neg_mean_squared_error')
             random_search.fit(X_train_fold, y_train_fold)
@@ -127,7 +126,7 @@ if __name__ == '__main__':
             print(f"Best Hyperparameters for fold {i}: {best_params}")
 
             # Train model with best hyperparameters
-            model = RandomForestRegressor(**best_params)
+            model = Ridge(**best_params)
             model.fit(X_train_fold, y_train_fold)
 
             pred_train = model.predict(X_train_fold)
@@ -153,15 +152,14 @@ if __name__ == '__main__':
                 'Successful_reconstructions_train': len(X_train_fold)
             }
             results = pd.concat([results, pd.DataFrame([current_results])], ignore_index=True)
-
             # Save train and validation datasets as CSV files
-            train_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_train_kf_rf_fold_{i}_byyear.csv"
+            train_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_train_kf_ridge_fold_{i}_noyear.csv"
             train_filepath = os.path.join(train_folder_path, train_filename)
             train_set = X_train_fold.copy()
             train_set['measured_leaf_area'] = y_train_fold
             train_set.to_csv(train_filepath, index=False)
 
-            val_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_val_kf_rf_fold_{i}_byyear.csv"
+            val_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_val_kf_ridge_fold_{i}_noyear.csv"
             val_filepath = os.path.join(test_folder_path, val_filename)
             val_set = X_val_fold.copy()
             val_set['measured_leaf_area'] = y_val_fold
@@ -174,7 +172,7 @@ if __name__ == '__main__':
                 best_model = model
 
         # Save the best model using pickle
-        model_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_best_model_rf_byyear.pkl"
+        model_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_best_model_ridge_noyear.pkl"
         model_filepath = os.path.join(model_folder_path, model_filename)
         with open(model_filepath, 'wb') as f:
             pickle.dump(best_model, f)
@@ -196,12 +194,12 @@ if __name__ == '__main__':
             'R2_score_test': r2_test
         }
         test_results_df = pd.DataFrame([test_results])
-        test_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_test_results_rf_byyear.csv"
+        test_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_test_results_ridge_noyear.csv"
         test_output_file_path = os.path.join(csv_folder_path, test_output_file)
         test_results_df.to_csv(test_output_file_path, index=False)
 
         # Save the k-fold results
-        kfold_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_kfold_results_rf_byyear.csv"
+        kfold_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_kfold_results_ridge_noyear.csv"
         kfold_output_file_path = os.path.join(kfold_results_path, kfold_output_file)
         results.to_csv(kfold_output_file_path, index=False)
 

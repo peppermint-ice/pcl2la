@@ -154,7 +154,7 @@ if __name__ == '__main__':
                 'Successful_reconstructions_test': len(X_val_fold),
                 'Successful_reconstructions_train': len(X_train_fold)
             }
-            results_xgb = pd.concat([results_xgb, pd.DataFrame([current_results])], ignore_index=True)
+            results = pd.concat([results, pd.DataFrame([current_results])], ignore_index=True)
 
             # Save train and validation datasets as CSV files
             train_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_train_kf_xgb_fold_{i}.csv"
@@ -205,7 +205,7 @@ if __name__ == '__main__':
         # Save the k-fold results
         kfold_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_kfold_results_xgb.csv"
         kfold_output_file_path = os.path.join(kfold_results_path, kfold_output_file)
-        results_xgb.to_csv(kfold_output_file_path, index=False)
+        results.to_csv(kfold_output_file_path, index=False)
 
     except ValueError as e:
         print('An error occurred:', e)
