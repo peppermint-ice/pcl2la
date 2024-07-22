@@ -11,7 +11,7 @@ folder_paths = paths.get_paths()
 csv_folder_path = folder_paths["results"]
 
 csvs = os.listdir(csv_folder_path)
-print(csv_export_path)
+
 
 df = pd.DataFrame()
 
@@ -25,4 +25,5 @@ for file in csvs:
 
 current_time = datetime.now().strftime("%d%m%y_%H%M")
 csv_export_path = os.path.join(folder_paths["combined"], f"combine_test_by_year_{current_time}.csv")
+print(csv_export_path)
 df.to_csv(csv_export_path, index=False)
