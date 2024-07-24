@@ -83,7 +83,7 @@ for algorithm in algorithm_names:
 # Identify the best parameter value for each algorithm based on R2_global_test
 best_params = df_filtered.loc[df_filtered.groupby(['algorithm_name', 'regression_model'])['R2_global_test'].idxmax()]
 
-#   Plot 1: Comparison of Regression Models Based on Best Parameter Values
+# Plot 1: Comparison of Regression Models Based on Best Parameter Values
 plt.figure(figsize=(14, 8))
 ax = sns.barplot(x='algorithm_name', y='R2_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
 plt.title('Comparison of Regression Models Based on Best Parameter Values')
@@ -93,10 +93,9 @@ plt.legend(title='Regression Model', loc='lower right')
 plt.grid(axis='y', zorder=0)
 
 # Add R² values on the bars
-for i, p in enumerate(ax.patches):
+for p in ax.patches:
     height = p.get_height()
-    stagger = (i % 2) * 6  # Stagger the text position
-    ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height + stagger),
+    ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height),
                 ha='center', va='bottom', fontsize=10, color='black', zorder=4)
 
 # Save the plot with an abstract name
@@ -108,7 +107,7 @@ plt.close()
 # Change axes to compare reconstruction methods
 pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name', values='R2_global_test')
 
-#   Plot 2: Comparison of Reconstruction Methods
+# Plot 2: Comparison of Reconstruction Methods
 plt.figure(figsize=(14, 8))
 ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3)
 plt.title('Comparison of Reconstruction Methods')
@@ -144,7 +143,7 @@ df_filtered = pd.read_csv(file_path)
 # Replace underscores with spaces and capitalize labels. Get new column names
 df_filtered = change_column_names(df_filtered)
 
-# 1.    Plot all RMSEs
+# 1. Plot all RMSEs
 # Get unique algorithm names
 algorithm_names = df_filtered['algorithm_name'].unique()
 
@@ -173,7 +172,7 @@ for algorithm in algorithm_names:
 # Identify the best parameter value for each algorithm based on R2_global_test
 best_params = df_filtered.loc[df_filtered.groupby(['algorithm_name', 'regression_model'])['RMSE_global_test'].idxmin()]
 
-#   Plot 1: Comparison of Regression Models Based on Best Parameter Values
+# Plot 1: Comparison of Regression Models Based on Best Parameter Values
 plt.figure(figsize=(14, 8))
 ax = sns.barplot(x='algorithm_name', y='RMSE_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
 plt.title('Comparison of Regression Models Based on Best Parameter Values')
@@ -197,7 +196,7 @@ plt.close()
 # Change axes to compare reconstruction methods
 pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name', values='RMSE_global_test')
 
-#   Plot 2: Comparison of Reconstruction Methods
+# Plot 2: Comparison of Reconstruction Methods
 plt.figure(figsize=(14, 8))
 ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3)
 plt.title('Comparison of Reconstruction Methods')
