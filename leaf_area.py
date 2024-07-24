@@ -734,7 +734,7 @@ def calculate_statistics_trimesh(mesh_file_path, repair=True):
 
 def eliminate_outliers_and_scale(file_path, export_path):
     df = pd.read_csv(file_path)
-    print(file_path)
+    print(f"Processing file: {file_path}")
     cols = [
         'height', 'length', 'width', 'volume', 'surface_area', 'aspect_ratio',
         'components_number', 'measured_leaf_area'
@@ -754,7 +754,7 @@ def eliminate_outliers_and_scale(file_path, export_path):
 
     # Print limits for debugging
     for column, limit in limits.items():
-        print(column, limit[1], limit[0])
+        print(f"{column} limits: {limit[1]}, {limit[0]}")
 
     # Remove outliers
     for column, limit in limits.items():
@@ -763,12 +763,11 @@ def eliminate_outliers_and_scale(file_path, export_path):
 
     # Check if there are any rows left after outlier removal
     if len(df) > 0:
-        # Print number of rows after outlier removal
-        print('after:', len(df))
+        print(f'Number of rows after outlier removal: {len(df)}')
 
         # Print min and max of each column for debugging
         for column in df.columns:
-            print(column, df[column].min(), df[column].max())
+            print(f"{column} min: {df[column].min()}, max: {df[column].max()}")
 
         # Create an instance of StandardScaler
         scaler = StandardScaler()
@@ -781,8 +780,10 @@ def eliminate_outliers_and_scale(file_path, export_path):
 
         # Save the processed file
         scaled_df.to_csv(export_path, index=False)
+        print(f"Processed file saved to: {export_path}")
     else:
         print("No data left after outlier removal. Exporting an empty DataFrame.")
+        pd.DataFrame().to_csv(export_path, index=False)
     return scaler
 
 if __name__ == '__main__':
