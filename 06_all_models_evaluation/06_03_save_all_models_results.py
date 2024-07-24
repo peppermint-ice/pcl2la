@@ -106,7 +106,7 @@ if __name__ == '__main__':
                 # Load scaler if elimination status is "elim"
                 scaler = None
                 if elimination_status == "elim":
-                    scaler_file_path = os.path.join(scalers_folder_path, f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_scaler_{regression_model}_{byyear}.pickle")
+                    scaler_file_path = os.path.join(scalers_folder_path, f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_scaler.pkl")
                     if os.path.exists(scaler_file_path):
                         with open(scaler_file_path, 'rb') as scaler_file:
                             scaler = pickle.load(scaler_file)
