@@ -15,7 +15,7 @@ filter_parameter = 'R2_global_test'
 df = pd.read_csv(file_path)
 
 # Group by 'algorithm_name' and 'parameter_value', then select the row with the highest 'R2_global_test' for each group
-df_filtered = df.loc[df.groupby(['algorithm_name', 'parameter_value', 'regression_model'])[filter_parameter].idxmax()]
+df_filtered = df.loc[df.groupby(['algorithm_name', 'parameter_value', 'regression_model', 'byyear'])[filter_parameter].idxmax()]
 
 # Save the filtered dataframe to a new CSV file
 output_file_name = file_name[:-4] + "_filtered2.csv"

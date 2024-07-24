@@ -72,14 +72,14 @@ if __name__ == '__main__':
                 train_file_names = []
                 for i in range(6):
                     test_file_names.append(
-                        f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_val_kf_{regression_model}_fold_{i}.csv")
+                        f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_val_kf_{regression_model}_fold_{i}_{byyear}.csv")
                     train_file_names.append(
-                        f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_train_kf_{regression_model}_fold_{i}.csv")
+                        f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_train_kf_{regression_model}_fold_{i}_{byyear}.csv")
                 # Define global test set file name
-                global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_{regression_model}_global_test_set.csv"
+                global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_{regression_model}_global_test_set_{byyear}.csv"
                 # Define files paths
                 if regression_model == "xgb":
-                    json_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_best_model_{regression_model}.json"
+                    json_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_best_model_{regression_model}_{byyear}.json"
                     model_file_path = os.path.join(models_folder_path, json_file_name)
                 else:
                     model_file_path = os.path.join(models_folder_path, model)
@@ -178,7 +178,8 @@ if __name__ == '__main__':
                    "assessment_name",
                    "dataset_type",
                    "elimination_status",
-                   "regression_model"
+                   "regression_model",
+                   "byyear"
                ] +
                [f"R2_training_{i}" for i in range(6)] +
                [f"R2_testing_{i}" for i in range(6)] +
