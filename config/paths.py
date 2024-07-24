@@ -46,10 +46,8 @@ def get_paths():
         "kfold_results": os.path.join(config[hostname]["plys"], "data/kfold_results"),
         "global_test_sets": os.path.join(config[hostname]["plys"], "data/global_test_sets"),
         "plots": os.path.join(config[hostname]["plys"], "data/plots"),
-        "prediction_plots": os.path.join(config[hostname]["plys"], "data/plots/prediction_plots"),
-        "pca_plots": os.path.join(config[hostname]["plys"], "data/plots/pca_plots"),
-        "feature_importance_plots": os.path.join(config[hostname]["plys"], "data/plots/feature_importance_plots"),
-        "scalers": os.path.join(config[hostname]["plys"], "data/scalers"),
+        "plots_all_reconstructions": os.path.join(config[hostname]["plys"], "data/plots/all_reconstructions"),
+        "plots_one_model": os.path.join(config[hostname]["plys"], "data/plots/one_model")
     }
 
     return paths
