@@ -26,8 +26,14 @@ df = pd.read_csv(results_file_path)
 # Iterate through each row and reverse scale if elimination_status is 'elim'
 for idx, row in df.iterrows():
     if row['elimination_status'] == 'elim':
+        # Determine the correct model file extension
+        if row['regression_model'] == 'xgb':
+            model_file_ext = 'json'
+        else:
+            model_file_ext = 'pkl'
+
         # Load the model
-        model_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_best_model_{row['regression_model']}_{row['byyear']}.json"
+        model_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_best_model_{row['regression_model']}_{row['byyear']}.{model_file_ext}"
         model_file_path = os.path.join(models_folder_path, model_file_name)
 
         if row['regression_model'] == 'xgb':
@@ -55,11 +61,12 @@ for idx, row in df.iterrows():
         mean = scaler.mean_
         scale = scaler.scale_
 
-        # Convert the test set into DMatrix for XGBoost
-        dtest = xgb.DMatrix(X_test)
-
         # Make predictions
-        y_pred = model.predict(dtest)
+        if row['regression_model'] == 'xgb':
+            dtest = xgb.DMatrix(X_test)
+            y_pred = model.predict(dtest)
+        else:
+            y_pred = model.predict(X_test)
 
         # Reverse scaling for y_true and y_pred
         y_test_unscaled = inverse_transform(y_test, mean[-1], scale[-1])
