@@ -27,7 +27,7 @@ df = pd.read_csv(results_file_path)
 for idx, row in df.iterrows():
     if row['elimination_status'] == 'elim':
         # Load the model
-        model_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_best_model_{row['regression_model']}.json"
+        model_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_best_model_{row['regression_model']}_{row['byyear']}.json"
         model_file_path = os.path.join(models_folder_path, model_file_name)
 
         if row['regression_model'] == 'xgb':
@@ -38,7 +38,7 @@ for idx, row in df.iterrows():
                 model = pickle.load(file)
 
         # Load the global test set
-        global_test_set_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_global_test_set.csv"
+        global_test_set_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_{row['regression_model']}_global_test_set_{row['byyear']}.csv"
         global_test_set_file_path = os.path.join(global_test_sets_path, global_test_set_file_name)
         global_test_df = pd.read_csv(global_test_set_file_path)
 
