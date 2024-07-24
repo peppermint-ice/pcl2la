@@ -112,6 +112,9 @@ for container in ax.containers:
         ax.annotate(f'{height:.2f}', (bar.get_x() + bar.get_width() / 2., height),
                     ha='center', va='bottom', fontsize=10, color='black', zorder=4)
 
+plt.legend(title='Algorithm Name', loc='lower right')
+plt.xticks(rotation=0)  # Set x-axis labels to be horizontal
+
 # Save the plot with an abstract name
 plot_filename = "Comparison_Reconstruction_Methods.png"
 plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
