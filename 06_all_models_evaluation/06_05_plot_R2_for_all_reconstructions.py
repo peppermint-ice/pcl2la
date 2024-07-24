@@ -93,9 +93,10 @@ plt.legend(title='Regression Model', loc='lower right')
 plt.grid(axis='y', zorder=0)
 
 # Add R² values on the bars
-for p in ax.patches:
+for i, p in enumerate(ax.patches):
     height = p.get_height()
-    ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height),
+    stagger = (i % 2) * 12  # Stagger the text position
+    ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height + stagger),
                 ha='center', va='bottom', fontsize=10, color='black', zorder=4)
 
 # Save the plot with an abstract name
