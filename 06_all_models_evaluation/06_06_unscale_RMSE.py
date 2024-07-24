@@ -50,7 +50,7 @@ for idx, row in df.iterrows():
                 model = pickle.load(file)
 
         # Load the global test set
-        global_test_set_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_{row['regression_model']}_global_test_set_{row['byyear']}.csv"
+        global_test_set_file_name = f"{row['algorithm_name']}_{parameter_value}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_{row['regression_model']}_global_test_set_{row['byyear']}.csv"
         global_test_set_file_path = os.path.join(global_test_sets_path, global_test_set_file_name)
         global_test_df = pd.read_csv(global_test_set_file_path)
 
@@ -60,7 +60,7 @@ for idx, row in df.iterrows():
 
         # If elimination_status is 'elim', load the original unscaled dataset to get scaling parameters
         unscaled_data_path = os.path.join(ready_for_training_path,
-                                          f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_noElim.csv")
+                                          f"{row['algorithm_name']}_{parameter_value}_{row['assessment_name']}_{row['dataset_type']}_noElim.csv")
         unscaled_data = pd.read_csv(unscaled_data_path)
         scaler = StandardScaler()
         scaler.fit(unscaled_data.drop(columns=['measured_leaf_area', 'experiment_number']))
