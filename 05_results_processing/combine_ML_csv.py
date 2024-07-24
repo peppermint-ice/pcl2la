@@ -24,6 +24,6 @@ for file in csvs:
 
 
 current_time = datetime.now().strftime("%d%m%y_%H%M")
-csv_export_path = os.path.join(folder_paths["combinedkfolds"], f"combine_test_by_year_{current_time}.csv")
+csv_export_path = os.path.join(folder_paths["combined"], f"combine_train_{current_time}.csv")
 print(csv_export_path)
 df.to_csv(csv_export_path, index=False)
