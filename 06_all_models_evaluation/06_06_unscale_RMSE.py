@@ -39,7 +39,7 @@ for idx, row in df.iterrows():
             parameter_value = str(int(parameter_value))
 
         # Load the model
-        model_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_best_model_{row['regression_model']}_{row['byyear']}.{model_file_ext}"
+        model_file_name = f"{row['algorithm_name']}_{parameter_value}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_best_model_{row['regression_model']}_{row['byyear']}.{model_file_ext}"
         model_file_path = os.path.join(models_folder_path, model_file_name)
 
         if row['regression_model'] == 'xgb':
