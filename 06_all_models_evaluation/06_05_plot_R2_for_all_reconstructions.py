@@ -8,7 +8,7 @@ from config import paths
 folder_paths = paths.get_paths()
 combined_folder_path = folder_paths["combined"]
 plots_all_reconstructions_folder_path = folder_paths["plots_all_reconstructions"]
-file_name = "combine_ML_240724_1608_filtered2.csv"
+file_name = "combine_ML_240724_1608_filtered.csv"
 file_path = os.path.join(combined_folder_path, file_name)
 
 # Load the filtered dataset
