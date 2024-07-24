@@ -88,7 +88,7 @@ if __name__ == '__main__':
         X_test_boruta = X_test_mi[selected_features_boruta]
 
         # Save the global test set
-        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_ridge_global_test_set.csv"
+        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_ridge_global_test_set_byyear.csv"
         global_test_filepath = os.path.join(global_test_path, global_test_filename)
         test_selected = pd.concat([X_test_boruta, y_test.reset_index(drop=True)], axis=1)
         test_selected.to_csv(global_test_filepath, index=False)
@@ -151,13 +151,13 @@ if __name__ == '__main__':
             }
             results = pd.concat([results, pd.DataFrame([current_results])], ignore_index=True)
             # Save train and validation datasets as CSV files
-            train_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_train_kf_ridge_fold_{i}.csv"
+            train_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_train_kf_ridge_fold_{i}_byyear.csv"
             train_filepath = os.path.join(train_folder_path, train_filename)
             train_set = X_train_fold.copy()
             train_set['measured_leaf_area'] = y_train_fold
             train_set.to_csv(train_filepath, index=False)
 
-            val_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_val_kf_ridge_fold_{i}.csv"
+            val_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_val_kf_ridge_fold_{i}_byyear.csv"
             val_filepath = os.path.join(test_folder_path, val_filename)
             val_set = X_val_fold.copy()
             val_set['measured_leaf_area'] = y_val_fold
@@ -170,7 +170,7 @@ if __name__ == '__main__':
                 best_model = model
 
         # Save the best model using pickle
-        model_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_best_model_ridge.pkl"
+        model_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_best_model_ridge_byyear.pkl"
         model_filepath = os.path.join(model_folder_path, model_filename)
         with open(model_filepath, 'wb') as f:
             pickle.dump(best_model, f)
@@ -192,12 +192,12 @@ if __name__ == '__main__':
             'R2_score_test': r2_test
         }
         test_results_df = pd.DataFrame([test_results])
-        test_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_test_results_ridge.csv"
+        test_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_test_results_ridge_byyear.csv"
         test_output_file_path = os.path.join(csv_folder_path, test_output_file)
         test_results_df.to_csv(test_output_file_path, index=False)
 
         # Save the k-fold results
-        kfold_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_kfold_results_ridge.csv"
+        kfold_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_kfold_results_ridge_byyear.csv"
         kfold_output_file_path = os.path.join(kfold_results_path, kfold_output_file)
         results.to_csv(kfold_output_file_path, index=False)
 
