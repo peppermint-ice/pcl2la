@@ -106,65 +106,68 @@ if __name__ == '__main__':
                 train_dfs = [pd.read_csv(train_file_paths[i]) for i in range(len(train_file_paths))]
                 print("Files loaded")
 
-                # GLOBAL TEST
-                print("Global test")
-                # Extract X and Y
-                x = global_test_df.drop('measured_leaf_area', axis=1)
-                y = global_test_df['measured_leaf_area']
-                # Run the model
-                y_pred = run_any_model(regression_model, x, model)
-                # Reverse scaling if elimination status is "elim"
-                if elimination_status == "elim" and scaler is not None:
-                    y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
-                    y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
-                # Get R2 and RMSE
-                r2_global_test = r2_score(y, y_pred)
-                rmse_global_test = mean_squared_error(y, y_pred, squared=False)
-                print("R2 score: ", r2_global_test)
-
-                # TESTING SETS
-                print("Testing sets")
-                r2_testing = []
-                for test_df in test_dfs:
-                    x = test_df.drop('measured_leaf_area', axis=1)
-                    y = test_df['measured_leaf_area']
+                try:
+                    # GLOBAL TEST
+                    print("Global test")
+                    # Extract X and Y
+                    x = global_test_df.drop('measured_leaf_area', axis=1)
+                    y = global_test_df['measured_leaf_area']
                     # Run the model
                     y_pred = run_any_model(regression_model, x, model)
                     # Reverse scaling if elimination status is "elim"
                     if elimination_status == "elim" and scaler is not None:
                         y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
                         y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
-                    # Get R2
-                    r2 = r2_score(y, y_pred)
-                    r2_testing.append(r2)
-                    print("R2 score: ", r2)
+                    # Get R2 and RMSE
+                    r2_global_test = r2_score(y, y_pred)
+                    rmse_global_test = mean_squared_error(y, y_pred, squared=False)
+                    print("R2 score: ", r2_global_test)
 
-                # TRAINING SETS
-                print("Training sets")
-                r2_training = []
-                for train_df in train_dfs:
-                    x = train_df.drop('measured_leaf_area', axis=1)
-                    y = train_df['measured_leaf_area']
-                    # Run the model
-                    y_pred = run_any_model(regression_model, x, model)
-                    # Reverse scaling if elimination status is "elim"
-                    if elimination_status == "elim" and scaler is not None:
-                        y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
-                        y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
-                    # Get R2
-                    r2 = r2_score(y, y_pred)
-                    r2_training.append(r2)
-                    print("R2 score: ", r2)
+                    # TESTING SETS
+                    print("Testing sets")
+                    r2_testing = []
+                    for test_df in test_dfs:
+                        x = test_df.drop('measured_leaf_area', axis=1)
+                        y = test_df['measured_leaf_area']
+                        # Run the model
+                        y_pred = run_any_model(regression_model, x, model)
+                        # Reverse scaling if elimination status is "elim"
+                        if elimination_status == "elim" and scaler is not None:
+                            y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
+                            y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
+                        # Get R2
+                        r2 = r2_score(y, y_pred)
+                        r2_testing.append(r2)
+                        print("R2 score: ", r2)
 
-                # Calculate means for training and testing
-                mean_r2_training = np.mean(r2_training)
-                mean_r2_testing = np.mean(r2_testing)
+                    # TRAINING SETS
+                    print("Training sets")
+                    r2_training = []
+                    for train_df in train_dfs:
+                        x = train_df.drop('measured_leaf_area', axis=1)
+                        y = train_df['measured_leaf_area']
+                        # Run the model
+                        y_pred = run_any_model(regression_model, x, model)
+                        # Reverse scaling if elimination status is "elim"
+                        if elimination_status == "elim" and scaler is not None:
+                            y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
+                            y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
+                        # Get R2
+                        r2 = r2_score(y, y_pred)
+                        r2_training.append(r2)
+                        print("R2 score: ", r2)
 
-                # Save the results
-                result = (model_parameters + r2_training + r2_testing +
-                          [mean_r2_training, mean_r2_testing, r2_global_test, rmse_global_test])
-                results.append(result)
-                print("")
+                    # Calculate means for training and testing
+                    mean_r2_training = np.mean(r2_training)
+                    mean_r2_testing = np.mean(r2_testing)
+
+                    # Save the results
+                    result = (model_parameters + r2_training + r2_testing +
+                              [mean_r2_training, mean_r2_testing, r2_global_test, rmse_global_test])
+                    results.append(result)
+                    print("")
+                except ValueError:
+                    print('Value Error')
 
     # Save results to CSV
     current_time = datetime.now().strftime("%d%m%y_%H%M")
