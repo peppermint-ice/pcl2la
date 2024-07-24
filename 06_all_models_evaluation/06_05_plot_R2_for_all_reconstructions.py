@@ -158,7 +158,7 @@ for algorithm in algorithm_names:
     )
     plt.title(f'RMSE on test set for {algorithm}')
     plt.xlabel('Parameter Value')
-    plt.ylabel('RMSE on test subset')
+    plt.ylabel('RMSE on test subset, cm²')
     plt.legend(title='Regression Model', loc='lower right')
 
     # Save the plot with abstract names
@@ -177,7 +177,7 @@ plt.figure(figsize=(14, 8))
 ax = sns.barplot(x='algorithm_name', y='RMSE_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
 plt.title('Comparison of Regression Models Based on Best Parameter Values')
 plt.xlabel('Algorithm Name')
-plt.ylabel('RMSE on test subset')
+plt.ylabel('RMSE on test subset, cm²')
 plt.legend(title='Regression Model', loc='lower right')
 plt.grid(axis='y', zorder=0)
 
@@ -201,7 +201,7 @@ plt.figure(figsize=(14, 8))
 ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3)
 plt.title('Comparison of Reconstruction Methods')
 plt.xlabel('Regression Model')
-plt.ylabel('RMSE on test subset')
+plt.ylabel('RMSE on test subset, cm²')
 plt.grid(axis='y', zorder=0)
 
 # Add R² values on the bars
