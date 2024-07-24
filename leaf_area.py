@@ -761,6 +761,9 @@ def eliminate_outliers_and_scale(file_path, export_path):
         df = df[(df[column] < limit[0]) & (df[column] > limit[1])]
     df.reset_index(drop=True, inplace=True)
 
+    # Initialize scaler
+    scaler = None
+
     # Check if there are any rows left after outlier removal
     if len(df) > 0:
         print(f'Number of rows after outlier removal: {len(df)}')
