@@ -55,7 +55,7 @@ if __name__ == '__main__':
         'Successful_reconstructions_train'
     ]
     current_results = dict.fromkeys(keys)
-    results_xgb = pd.DataFrame()
+    results = pd.DataFrame()
 
     try:
         print('starting grid search')

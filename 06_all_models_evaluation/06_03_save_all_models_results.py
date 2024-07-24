@@ -10,11 +10,6 @@ from config import paths
 from datetime import datetime
 
 
-def set_random_seed(seed=42):
-    np.random.seed(seed)
-    xgb.set_config(seed=seed)
-
-
 def run_any_model(regression_model, x, model):
     # Run the model. XGBoost requires specific approach
     if regression_model == 'xgb':
@@ -44,6 +39,7 @@ if __name__ == '__main__':
     train_folder_path = folder_paths["train_sets"]
     test_folder_path = folder_paths["test_sets"]
     ready_for_training_path = folder_paths["ready_for_training"]
+    scalers_folder_path = folder_paths["scalers"]
 
     # List to store results
     results = []
@@ -58,7 +54,7 @@ if __name__ == '__main__':
         # Check that the file is actually a model
         if os.path.isfile(os.path.join(models_folder_path, model)) and os.path.splitext(model)[1] == ".pkl":
             # Set the pattern to use regex
-            pattern = "(\w*_?\w*?)_(\w*[.]?\w*)_(\w*)_(\w*)_(\w*)_best_model_(\w*).(\w*)"
+            pattern = "(\w*_?\w*?)_(\w*[.]?\w*)_(\w*)_(\w*)_(\w*)_best_model_(\w*)_(\w*).(\w*)"
             match = re.search(pattern, model)
             # Get parameters of the file
             if match:
@@ -68,11 +64,12 @@ if __name__ == '__main__':
                 dataset_type = match.group(4)
                 elimination_status = match.group(5)
                 regression_model = match.group(6)
-                file_type = match.group(7)
+                byyear = match.group(7)
+                file_type = match.group(8)
                 # Save them into one list
-                model_parameters = [algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status, regression_model]
+                model_parameters = [algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status, regression_model, byyear]
                 print("File:")
-                print(algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status, regression_model)
+                print(algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status, regression_model, byyear)
                 # We are only interested in noElim files
                 if elimination_status == "noElim":
                     # Create file names
