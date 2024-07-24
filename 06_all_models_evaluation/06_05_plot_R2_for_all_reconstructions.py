@@ -8,7 +8,7 @@ from config import paths
 folder_paths = paths.get_paths()
 combined_folder_path = folder_paths["combined"]
 plots_all_reconstructions_folder_path = folder_paths["plots_all_reconstructions"]
-file_name = "combine_ML_240724_1608_filtered.csv"
+file_name = "combine_ML_240724_1608_scaled_filtered_rmse.csv"
 file_path = os.path.join(combined_folder_path, file_name)
 
 # Load the filtered dataset
@@ -55,15 +55,15 @@ for algorithm in algorithm_names:
     plt.grid(True, which='both', axis='y', zorder=1)
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
     ax = sns.barplot(
-        x='parameter_value', y='R2_global_test', hue='regression_model', data=subset, palette=model_colors, zorder=2
+        x='parameter_value', y='RMSE_global_test', hue='regression_model', data=subset, palette=model_colors, zorder=2
     )
-    plt.title(f'R2 on test set for {algorithm}')
+    plt.title(f'RMSE on test set for {algorithm}')
     plt.xlabel('Parameter Value')
-    plt.ylabel('R2 on test subset')
+    plt.ylabel('RMSE on test subset')
     plt.legend(title='Regression Model')
 
     # Save the plot with abstract names
-    plot_filename = f"R2_test_{algorithm.replace(' ', '_')}.png"
+    plot_filename = f"RMSE_test_{algorithm.replace(' ', '_')}.png"
     plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
     plt.savefig(plot_filepath)
     plt.close()
@@ -71,14 +71,14 @@ for algorithm in algorithm_names:
 # 2. Plot best R2 for each algorithm
 
 # Identify the best parameter value for each algorithm based on R2_global_test
-best_params = df_filtered.loc[df_filtered.groupby(['algorithm_name', 'regression_model'])['R2_global_test'].idxmax()]
+best_params = df_filtered.loc[df_filtered.groupby(['algorithm_name', 'regression_model'])['RMSE_global_test'].idxmax()]
 
 # Plot 1: Comparison of Regression Models Based on Best Parameter Values
 plt.figure(figsize=(14, 8))
-ax = sns.barplot(x='algorithm_name', y='R2_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
+ax = sns.barplot(x='algorithm_name', y='RMSE_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
 plt.title('Comparison of Regression Models Based on Best Parameter Values')
 plt.xlabel('Algorithm Name')
-plt.ylabel('R2 on test subset')
+plt.ylabel('RMSE on test subset')
 plt.legend(title='Regression Model')
 plt.grid(axis='y', zorder=0)
 
@@ -89,20 +89,20 @@ for p in ax.patches:
                 ha='center', va='bottom', fontsize=10, color='black', zorder=4)
 
 # Save the plot with an abstract name
-plot_filename = "Best_R2_per_Algorithm.png"
+plot_filename = "Best_RMSE_per_Algorithm.png"
 plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
 plt.savefig(plot_filepath)
 plt.close()
 
 # Change axes to compare reconstruction methods
-pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name', values='R2_global_test')
+pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name', values='RMSE_global_test')
 
 # Plot 2: Comparison of Reconstruction Methods
 plt.figure(figsize=(14, 8))
 ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3)
 plt.title('Comparison of Reconstruction Methods')
 plt.xlabel('Regression Model')
-plt.ylabel('R2 on test subset')
+plt.ylabel('RMSE on test subset')
 plt.grid(axis='y', zorder=0)
 
 # Add R² values on the bars
@@ -116,7 +116,7 @@ plt.legend(title='Algorithm Name', loc='lower right')
 plt.xticks(rotation=0)  # Set x-axis labels to be horizontal
 
 # Save the plot with an abstract name
-plot_filename = "Comparison_Reconstruction_Methods.png"
+plot_filename = "Comparison_Reconstruction_Methods_RMSE.png"
 plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
 plt.savefig(plot_filepath)
 plt.close()
