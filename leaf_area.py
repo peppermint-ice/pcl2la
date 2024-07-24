@@ -481,6 +481,7 @@ def calculate_watertight_volume(shape):
 
 
 def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
+    shape = o3d.io.read_triangle_mesh(mesh)
     point_cloud = o3d.io.read_point_cloud(point_cloud_file_path)
     point_cloud_array = np.asarray(point_cloud.points)
     print('files loaded')
@@ -489,9 +490,42 @@ def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
     print('dimensions calculated')
     # Swap dimensions for height, length, and width
     dimensions = dimensions[[1, 2, 0]]
+    # Calculate bounding box
+    # Compute the axis-aligned bounding box (AABB)
+    bounding_box = shape.get_axis_aligned_bounding_box()
 
+    # Extract the minimum and maximum points of the bounding box
+    min_point = bounding_box.min_bound
+    max_point = bounding_box.max_bound
+
+    # Vertices of the bounding box in the XY plane
+    vertices = np.array([
+        [min_point[0], min_point[1]],
+        [min_point[0], max_point[1]],
+        [max_point[0], min_point[1]],
+        [max_point[0], max_point[1]]
+    ])
+
+    # Calculate all pairwise distances in the XY plane
+    pairwise_distances = []
+    for i in range(len(vertices)):
+        for j in range(i + 1, len(vertices)):
+            distance = np.linalg.norm(vertices[i] - vertices[j])
+            pairwise_distances.append(distance)
+
+    # Identify the shortest and longest distances
+    width = min(pairwise_distances)
+    length = max(pairwise_distances)
+
+    # Calculate the height
+    height = max_point[2] - min_point[2]
+
+    # Calculate volumes and areas
+    bounding_box_volume = length * width * height
+    bounding_box_xy_area = width * length
+
+    print('bounding boxes calculated')
     # Calculate surface area
-    shape = o3d.io.read_triangle_mesh(mesh)
     surface_area = shape.get_surface_area()
     print('surface area calculated')
     # Calculate aspect ratio
@@ -516,25 +550,25 @@ def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
     #     flatness = 0
     # print('flatness calculated')
     # Get connected components
-    connected_components = shape.cluster_connected_triangles()
-    print('connected components calculated')
+    # connected_components = shape.cluster_connected_triangles()
+    # print('connected components calculated')
     # Initialize a dictionary to store parameters for each component
     component_parameters = {}
 
     # Calculate sphericity for the entire alpha shape
-    try:
-        sphericity = (np.pi ** (1 / 3)) * ((6 * total_volume) ** (2 / 3)) / surface_area
-    except ZeroDivisionError:
-        print("Can't calculate sphericity. Division by zero.")
-        sphericity = 0
-    print('sphericity calculated')
-    # Calculate compactness for the entire alpha shape
-    try:
-        compactness = (36 * np.pi * total_volume ** 2) ** (1 / 3) / surface_area
-    except ZeroDivisionError:
-        print("Can't calculate compactness. Division by zero.")
-        compactness = 0
-    print('compactness calculated')
+    # try:
+    #     sphericity = (np.pi ** (1 / 3)) * ((6 * total_volume) ** (2 / 3)) / surface_area
+    # except ZeroDivisionError:
+    #     print("Can't calculate sphericity. Division by zero.")
+    #     sphericity = 0
+    # print('sphericity calculated')
+    # # Calculate compactness for the entire alpha shape
+    # try:
+    #     compactness = (36 * np.pi * total_volume ** 2) ** (1 / 3) / surface_area
+    # except ZeroDivisionError:
+    #     print("Can't calculate compactness. Division by zero.")
+    #     compactness = 0
+    # print('compactness calculated')
     # Calculate number of independent components
     vertices = np.asarray(shape.vertices)
     triangles = np.asarray(shape.triangles)
@@ -556,12 +590,14 @@ def calculate_shape_parameters(point_cloud_file_path, mesh, total_volume):
     print('point density calculated')
     # Store parameters for the entire alpha shape
     parameters = {
-        'height': dimensions[0],
-        'length': dimensions[1],
-        'width': dimensions[2],
+        'height': height,
+        'length': length,
+        'width': width,
         'volume': total_volume,
         'surface_area': surface_area,
         'aspect_ratio': aspect_ratio,
+        'bounding_box_volume': bounding_box_volume,
+        'bounding_box_xy_area': bounding_box_xy_area,
         'components_number': components
     }
     return parameters
