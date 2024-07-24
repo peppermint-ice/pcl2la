@@ -34,6 +34,7 @@ for idx, row in df.iterrows():
 
         # Adjust the parameter_value to remove the decimal point if it's a whole number
         parameter_value = row['parameter_value']
+        print(parameter_value)
         if float(parameter_value).is_integer():
             parameter_value = str(int(parameter_value))
 
