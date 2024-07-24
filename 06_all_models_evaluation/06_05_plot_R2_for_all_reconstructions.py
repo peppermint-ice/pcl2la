@@ -92,7 +92,7 @@ pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name
 
 # Plot 2: Comparison of Reconstruction Methods
 plt.figure(figsize=(14, 8))
-ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3, color=[colors.get(x, '#333333') for x in pivot_data.columns])
+ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3, color=[colors.get(col, '#333333') for col in pivot_data.columns])
 plt.title('Comparison of Reconstruction Methods')
 plt.xlabel('Regression Model')
 plt.ylabel('R2 on test subset')
