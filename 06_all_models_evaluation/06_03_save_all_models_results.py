@@ -6,10 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, mean_squared_error
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 from config import paths
 from datetime import datetime
-
 
 def run_any_model(regression_model, x, model):
     # Run the model. XGBoost requires specific approach
@@ -20,15 +18,18 @@ def run_any_model(regression_model, x, model):
         y_pred = model.predict(x)
     return y_pred
 
-
 def plot_prediction(y_pred, y, model_parameters, subset_name):
     r2 = r2_score(y, y_pred)
     if r2 > 0.85:
         plt.scatter(y, y_pred)
-        plt.title(
-            f"R2 score for {model_parameters[0]} {model_parameters[1]} {model_parameters[5]} {subset_name}: {round(r2, 2)}")
+        plt.title(f"R2 score for {model_parameters[0]} {model_parameters[1]} {model_parameters[5]} {subset_name}: {round(r2, 2)}")
         plt.show()
 
+def adjust_features(df, expected_features):
+    for feature in expected_features:
+        if feature not in df.columns:
+            df[feature] = 0
+    return df[expected_features]
 
 if __name__ == '__main__':
     # Set folder paths
@@ -39,6 +40,9 @@ if __name__ == '__main__':
     test_folder_path = folder_paths["test_sets"]
     scalers_folder_path = folder_paths["scalers"]
     ready_for_training_path = folder_paths["ready_for_training"]
+
+    # Define the expected features (the ones used when the scaler was fit)
+    expected_features = ['height', 'length', 'width', 'volume', 'surface_area', 'aspect_ratio', 'components_number', 'measured_leaf_area']
 
     # List to store results
     results = []
@@ -62,19 +66,15 @@ if __name__ == '__main__':
                 byyear = match.group(7)
                 file_type = match.group(8)
                 # Save them into one list
-                model_parameters = [algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status,
-                                    regression_model, byyear]
+                model_parameters = [algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status, regression_model, byyear]
                 print("File:")
-                print(algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status,
-                      regression_model, byyear)
+                print(algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status, regression_model, byyear)
                 # Create file names
                 test_file_names = []
                 train_file_names = []
                 for i in range(6):
-                    test_file_names.append(
-                        f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_val_kf_{regression_model}_fold_{i}_{byyear}.csv")
-                    train_file_names.append(
-                        f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_train_kf_{regression_model}_fold_{i}_{byyear}.csv")
+                    test_file_names.append(f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_val_kf_{regression_model}_fold_{i}_{byyear}.csv")
+                    train_file_names.append(f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_train_kf_{regression_model}_fold_{i}_{byyear}.csv")
                 # Define global test set file name
                 global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_{regression_model}_global_test_set_{byyear}.csv"
                 # Define files paths
@@ -84,10 +84,8 @@ if __name__ == '__main__':
                 else:
                     model_file_path = os.path.join(models_folder_path, model)
                 global_test_set_file_path = os.path.join(global_test_sets_path, global_test_set_file_name)
-                test_file_paths = [os.path.join(test_folder_path, test_file_names[i]) for i in
-                                   range(len(test_file_names))]
-                train_file_paths = [os.path.join(train_folder_path, train_file_names[i]) for i in
-                                    range(len(train_file_names))]
+                test_file_paths = [os.path.join(test_folder_path, test_file_names[i]) for i in range(len(test_file_names))]
+                train_file_paths = [os.path.join(train_folder_path, train_file_names[i]) for i in range(len(train_file_names))]
 
                 # Load model
                 with open(model_file_path, 'rb') as file:
@@ -106,20 +104,24 @@ if __name__ == '__main__':
                 print("Files loaded")
 
                 # Load scaler if elimination status is "elim"
+                scaler = None
                 if elimination_status == "elim":
-                    scaler_file_path = os.path.join(scalers_folder_path,
-                                                    f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_scaler.pkl")
-                    with open(scaler_file_path, 'rb') as scaler_file:
-                        scaler = pickle.load(scaler_file)
-                    print("Scaler loaded")
+                    scaler_file_path = os.path.join(scalers_folder_path, f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_scaler_{regression_model}_{byyear}.pickle")
+                    if os.path.exists(scaler_file_path):
+                        with open(scaler_file_path, 'rb') as scaler_file:
+                            scaler = pickle.load(scaler_file)
+                        print("Scaler loaded")
+                    else:
+                        print(f"Scaler file not found: {scaler_file_path}")
 
                 # GLOBAL TEST
                 print("Global test")
                 # Extract X and Y
                 x = global_test_df.drop('measured_leaf_area', axis=1)
                 y = global_test_df['measured_leaf_area']
-                # Scale X if elimination status is "elim"
-                if elimination_status == "elim":
+                # Adjust features to match the scaler's expected features
+                if elimination_status == "elim" and scaler is not None:
+                    x = adjust_features(x, expected_features[:-1])
                     x = scaler.transform(x)
                 # Run the model
                 y_pred = run_any_model(regression_model, x, model)
@@ -134,8 +136,9 @@ if __name__ == '__main__':
                 for test_df in test_dfs:
                     x = test_df.drop('measured_leaf_area', axis=1)
                     y = test_df['measured_leaf_area']
-                    # Scale X if elimination status is "elim"
-                    if elimination_status == "elim":
+                    # Adjust features to match the scaler's expected features
+                    if elimination_status == "elim" and scaler is not None:
+                        x = adjust_features(x, expected_features[:-1])
                         x = scaler.transform(x)
                     # Run the model
                     y_pred = run_any_model(regression_model, x, model)
@@ -150,8 +153,9 @@ if __name__ == '__main__':
                 for train_df in train_dfs:
                     x = train_df.drop('measured_leaf_area', axis=1)
                     y = train_df['measured_leaf_area']
-                    # Scale X if elimination status is "elim"
-                    if elimination_status == "elim":
+                    # Adjust features to match the scaler's expected features
+                    if elimination_status == "elim" and scaler is not None:
+                        x = adjust_features(x, expected_features[:-1])
                         x = scaler.transform(x)
                     # Run the model
                     y_pred = run_any_model(regression_model, x, model)
