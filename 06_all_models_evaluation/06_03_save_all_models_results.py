@@ -43,6 +43,7 @@ if __name__ == '__main__':
 
     # Run through each model file
     models = os.listdir(models_folder_path)
+    print(len(models))
     for model in models:
         # Check that the file is actually a model
         if os.path.isfile(os.path.join(models_folder_path, model)) and os.path.splitext(model)[1] == ".pkl":
