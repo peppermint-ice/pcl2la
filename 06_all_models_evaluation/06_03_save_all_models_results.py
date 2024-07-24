@@ -169,6 +169,7 @@ if __name__ == '__main__':
                 except ValueError:
                     print('Value Error')
 
+
     # Save results to CSV
     current_time = datetime.now().strftime("%d%m%y_%H%M")
     columns = ([
