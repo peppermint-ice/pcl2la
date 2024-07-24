@@ -775,11 +775,13 @@ def eliminate_outliers_and_scale(file_path, export_path):
         # Create an instance of StandardScaler
         scaler = StandardScaler()
 
-        # Fit the scaler on the data and transform it
-        scaled_data = scaler.fit_transform(df)
+        # Fit the scaler on the data and transform it, excluding 'experiment_number'
+        scaling_columns = df.columns.difference(['experiment_number'])
+        scaled_data = scaler.fit_transform(df[scaling_columns])
 
         # Convert the scaled data back to a DataFrame
-        scaled_df = pd.DataFrame(scaled_data, columns=df.columns)
+        scaled_df = pd.DataFrame(scaled_data, columns=scaling_columns)
+        scaled_df['experiment_number'] = df['experiment_number'].values  # Add 'experiment_number' back to the DataFrame
 
         # Save the processed file
         scaled_df.to_csv(export_path, index=False)
