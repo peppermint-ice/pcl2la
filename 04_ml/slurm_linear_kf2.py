@@ -100,6 +100,8 @@ if __name__ == '__main__':
         # Switch X_train/test into the cleaned ones
         X_train = X_train_boruta
         X_test = X_test_boruta
+        y_train = y_train.reset_index(drop=True)
+        y_test = y_test.reset_index(drop=True)
 
         # Initialize KFold cross-validator
         num_splits = 6

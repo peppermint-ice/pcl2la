@@ -90,6 +90,8 @@ if __name__ == '__main__':
         # Reset indices to avoid row mismatching
         X_train_boruta = X_train_boruta.reset_index(drop=True)
         X_test_boruta = X_test_boruta.reset_index(drop=True)
+        y_train = y_train.reset_index(drop=True)
+        y_test = y_test.reset_index(drop=True)
 
         # Save the global test set
         global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_lasso_global_test_set_byyear.csv"

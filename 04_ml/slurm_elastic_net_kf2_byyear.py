@@ -79,6 +79,7 @@ if __name__ == '__main__':
         X_train_mi = X_train[selected_features_mi]
         X_test_mi = X_test[selected_features_mi]
 
+
         # Further feature selection using Boruta
         rf = RandomForestRegressor(n_jobs=-1, max_depth=5)
         boruta_selector = BorutaPy(rf, n_estimators='auto', random_state=42)
@@ -90,6 +91,8 @@ if __name__ == '__main__':
         # Reset indices to avoid row mismatching
         X_train_boruta = X_train_boruta.reset_index(drop=True)
         X_test_boruta = X_test_boruta.reset_index(drop=True)
+        y_train = y_train.reset_index(drop=True)
+        y_test = y_test.reset_index(drop=True)
 
         # Save the global test set
         global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_en_global_test_set_byyear.csv"
