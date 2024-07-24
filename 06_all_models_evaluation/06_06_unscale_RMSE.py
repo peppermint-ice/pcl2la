@@ -34,12 +34,8 @@ for idx, row in df.iterrows():
 
         # Adjust the parameter_value to remove the decimal point if it's a whole number
         parameter_value = row['parameter_value']
-        try:
-            float_value = float(parameter_value)
-            if float_value.is_integer():
-                parameter_value = str(int(float_value))
-        except ValueError:
-            pass  # Keep parameter_value as is if it's not a number
+        if float(parameter_value).is_integer():
+            parameter_value = str(int(parameter_value))
 
         # Load the model
         model_file_name = f"{row['algorithm_name']}_{row['parameter_value']}_{row['assessment_name']}_{row['dataset_type']}_{row['elimination_status']}_best_model_{row['regression_model']}_{row['byyear']}.{model_file_ext}"
