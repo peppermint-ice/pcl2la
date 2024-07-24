@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, mean_squared_error
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 from config import paths
 from datetime import datetime
 
@@ -25,11 +26,8 @@ def plot_prediction(y_pred, y, model_parameters, subset_name):
         plt.title(f"R2 score for {model_parameters[0]} {model_parameters[1]} {model_parameters[5]} {subset_name}: {round(r2, 2)}")
         plt.show()
 
-def adjust_features(df, expected_features):
-    for feature in expected_features:
-        if feature not in df.columns:
-            df[feature] = 0
-    return df[expected_features]
+def inverse_transform(scaled_values, mean, scale):
+    return scaled_values * scale + mean
 
 if __name__ == '__main__':
     # Set folder paths
@@ -38,11 +36,7 @@ if __name__ == '__main__':
     global_test_sets_path = folder_paths["global_test_sets"]
     train_folder_path = folder_paths["train_sets"]
     test_folder_path = folder_paths["test_sets"]
-    scalers_folder_path = folder_paths["scalers"]
     ready_for_training_path = folder_paths["ready_for_training"]
-
-    # Define the expected features (the ones used when the scaler was fit)
-    expected_features = ['height', 'length', 'width', 'volume', 'surface_area', 'aspect_ratio', 'components_number', 'measured_leaf_area']
 
     # List to store results
     results = []
@@ -96,6 +90,12 @@ if __name__ == '__main__':
                         model = pickle.load(file)
                 print("Model loaded")
 
+                # Load the original unscaled dataset and fit the scaler
+                unscaled_data_path = os.path.join(ready_for_training_path, f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_noElim.csv")
+                unscaled_data = pd.read_csv(unscaled_data_path)
+                scaler = StandardScaler()
+                scaler.fit(unscaled_data.drop('measured_leaf_area', axis=1))
+
                 # Load test set
                 global_test_df = pd.read_csv(global_test_set_file_path)
                 # Load test and train datasets
@@ -103,31 +103,19 @@ if __name__ == '__main__':
                 train_dfs = [pd.read_csv(train_file_paths[i]) for i in range(len(train_file_paths))]
                 print("Files loaded")
 
-                # Load scaler if elimination status is "elim"
-                scaler = None
-                if elimination_status == "elim":
-                    scaler_file_path = os.path.join(scalers_folder_path, f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_scaler.pkl")
-                    if os.path.exists(scaler_file_path):
-                        with open(scaler_file_path, 'rb') as scaler_file:
-                            scaler = pickle.load(scaler_file)
-                        print("Scaler loaded")
-                    else:
-                        print(f"Scaler file not found: {scaler_file_path}")
-
                 # GLOBAL TEST
                 print("Global test")
                 # Extract X and Y
                 x = global_test_df.drop('measured_leaf_area', axis=1)
                 y = global_test_df['measured_leaf_area']
-                # Adjust features to match the scaler's expected features
-                if elimination_status == "elim" and scaler is not None:
-                    x = adjust_features(x, expected_features[:-1])
-                    x = scaler.transform(x)
                 # Run the model
                 y_pred = run_any_model(regression_model, x, model)
+                # Reverse scaling
+                y_pred_rescaled = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
+                y_rescaled = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
                 # Get R2 and RMSE
-                r2_global_test = r2_score(y, y_pred)
-                rmse_global_test = mean_squared_error(y, y_pred, squared=False)
+                r2_global_test = r2_score(y_rescaled, y_pred_rescaled)
+                rmse_global_test = mean_squared_error(y_rescaled, y_pred_rescaled, squared=False)
                 print("R2 score: ", r2_global_test)
 
                 # TESTING SETS
@@ -136,14 +124,13 @@ if __name__ == '__main__':
                 for test_df in test_dfs:
                     x = test_df.drop('measured_leaf_area', axis=1)
                     y = test_df['measured_leaf_area']
-                    # Adjust features to match the scaler's expected features
-                    if elimination_status == "elim" and scaler is not None:
-                        x = adjust_features(x, expected_features[:-1])
-                        x = scaler.transform(x)
                     # Run the model
                     y_pred = run_any_model(regression_model, x, model)
+                    # Reverse scaling
+                    y_pred_rescaled = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
+                    y_rescaled = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
                     # Get R2
-                    r2 = r2_score(y, y_pred)
+                    r2 = r2_score(y_rescaled, y_pred_rescaled)
                     r2_testing.append(r2)
                     print("R2 score: ", r2)
 
@@ -153,14 +140,13 @@ if __name__ == '__main__':
                 for train_df in train_dfs:
                     x = train_df.drop('measured_leaf_area', axis=1)
                     y = train_df['measured_leaf_area']
-                    # Adjust features to match the scaler's expected features
-                    if elimination_status == "elim" and scaler is not None:
-                        x = adjust_features(x, expected_features[:-1])
-                        x = scaler.transform(x)
                     # Run the model
                     y_pred = run_any_model(regression_model, x, model)
+                    # Reverse scaling
+                    y_pred_rescaled = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
+                    y_rescaled = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
                     # Get R2
-                    r2 = r2_score(y, y_pred)
+                    r2 = r2_score(y_rescaled, y_pred_rescaled)
                     r2_training.append(r2)
                     print("R2 score: ", r2)
 
