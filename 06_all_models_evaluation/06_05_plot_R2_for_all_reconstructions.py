@@ -26,8 +26,8 @@ df_filtered['regression_model'] = df_filtered['regression_model'].replace({
     'linear': 'Linear'
 })
 
-# Define colors for each regression model
-colors = {
+# Define colors for each regression model and reconstruction method
+model_colors = {
     'XGBoost': 'blue',
     'Random Forest': 'green',
     'Elastic Net': 'orange',
@@ -35,6 +35,13 @@ colors = {
     'Ridge': 'red',
     'MLP': 'brown',
     'Linear': 'pink'
+}
+
+reconstruction_colors = {
+    'Alpha': 'blue',
+    'Marching cubes': 'green',
+    'Ball pivoting': 'orange',
+    'Poisson': 'purple'
 }
 
 # 1. Plot all R2s
@@ -48,7 +55,7 @@ for algorithm in algorithm_names:
     plt.grid(True, which='both', axis='y', zorder=1)
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
     ax = sns.barplot(
-        x='parameter_value', y='R2_global_test', hue='regression_model', data=subset, palette=colors, zorder=2
+        x='parameter_value', y='R2_global_test', hue='regression_model', data=subset, palette=model_colors, zorder=2
     )
     plt.title(f'R2 on test set for {algorithm}')
     plt.xlabel('Parameter Value')
@@ -68,7 +75,7 @@ best_params = df_filtered.loc[df_filtered.groupby(['algorithm_name', 'regression
 
 # Plot 1: Comparison of Regression Models Based on Best Parameter Values
 plt.figure(figsize=(14, 8))
-ax = sns.barplot(x='algorithm_name', y='R2_global_test', hue='regression_model', data=best_params, palette=colors, zorder=3)
+ax = sns.barplot(x='algorithm_name', y='R2_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
 plt.title('Comparison of Regression Models Based on Best Parameter Values')
 plt.xlabel('Algorithm Name')
 plt.ylabel('R2 on test subset')
@@ -92,7 +99,7 @@ pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name
 
 # Plot 2: Comparison of Reconstruction Methods
 plt.figure(figsize=(14, 8))
-ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3, color=[colors.get(col, '#333333') for col in pivot_data.columns])
+ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3, color=[reconstruction_colors.get(col, '#333333') for col in pivot_data.columns])
 plt.title('Comparison of Reconstruction Methods')
 plt.xlabel('Regression Model')
 plt.ylabel('R2 on test subset')
