@@ -11,10 +11,14 @@ from config import paths
 from datetime import datetime
 from sklearn.decomposition import PCA
 
-model_file_name = "marching_cubes_1_o3d_simple_noElim_best_model_xgb.json"
+def inverse_transform(scaled_values, mean, scale):
+    return scaled_values * scale + mean
+
+
+model_file_name = "marching_cubes_13_trimesh_repaired_noElim_best_model_xgb_noyear.json"
 
 # Set the pattern to use regex
-pattern = r"(\w*_?\w*?)_(\w*[.]?\w*)_(\w*)_(\w*)_(\w*)_best_model_(\w*)\.(\w*)"
+pattern = r"(\w*_?\w*?)_(\w*[.]?\w*)_(\w*)_(\w*)_(\w*)_best_model_(\w*)_(\w*)\.(\w*)"
 match = re.search(pattern, model_file_name)
 # Get parameters of the file
 if match:
@@ -24,7 +28,8 @@ if match:
     dataset_type = match.group(4)
     elimination_status = match.group(5)
     regression_model = match.group(6)
-    file_type = match.group(7)
+    byyear = match.group(7)
+    file_type = match.group(8)
 print(algorithm_name, parameter_value, assessment_name, dataset_type, elimination_status, regression_model, file_type)
 
 # Set folder paths
@@ -46,7 +51,7 @@ else:
 print("Model loaded")
 
 # Load test set
-global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_global_test_set.csv"
+global_test_set_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_global_test_set_{byyear}.csv"
 global_test_set_file_path = os.path.join(global_test_sets_path, global_test_set_file_name)
 global_test_df = pd.read_csv(global_test_set_file_path)
 print(len(global_test_df))

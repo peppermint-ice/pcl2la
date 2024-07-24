@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from config import paths
 from datetime import datetime
 
+
 def run_any_model(regression_model, x, model):
     # Run the model. XGBoost requires specific approach
     if regression_model == 'xgb':
@@ -19,12 +20,6 @@ def run_any_model(regression_model, x, model):
         y_pred = model.predict(x)
     return y_pred
 
-def plot_prediction(y_pred, y, model_parameters, subset_name):
-    r2 = r2_score(y, y_pred)
-    if r2 > 0.85:
-        plt.scatter(y, y_pred)
-        plt.title(f"R2 score for {model_parameters[0]} {model_parameters[1]} {model_parameters[5]} {subset_name}: {round(r2, 2)}")
-        plt.show()
 
 def inverse_transform(scaled_values, mean, scale):
     return scaled_values * scale + mean
