@@ -89,6 +89,10 @@ if __name__ == '__main__':
         X_train_boruta = X_train_mi[selected_features_boruta]
         X_test_boruta = X_test_mi[selected_features_boruta]
 
+        # Reset indices to avoid row mismatching
+        X_train_boruta = X_train_boruta.reset_index(drop=True)
+        X_test_boruta = X_test_boruta.reset_index(drop=True)
+
         # Save the global test set
         global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_xgb_global_test_set_noyear.csv"
         global_test_filepath = os.path.join(global_test_path, global_test_filename)

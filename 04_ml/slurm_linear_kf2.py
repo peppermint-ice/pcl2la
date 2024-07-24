@@ -85,6 +85,7 @@ if __name__ == '__main__':
         X_train_boruta = X_train_mi[selected_features_boruta]
         X_test_boruta = X_test_mi[selected_features_boruta]
 
+        # Reset indices to avoid row mismatching
         X_train_boruta = X_train_boruta.reset_index(drop=True)
         X_test_boruta = X_test_boruta.reset_index(drop=True)
 
