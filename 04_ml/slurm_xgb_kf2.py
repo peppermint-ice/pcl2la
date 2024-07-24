@@ -187,6 +187,11 @@ if __name__ == '__main__':
         with open(model_filepath, 'wb') as f:
             pickle.dump(best_model, f)
 
+        # Save the best model using XGBoost's JSON format
+        json_model_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_best_model_xgb_noyear.json"
+        json_model_filepath = os.path.join(model_folder_path, json_model_filename)
+        best_model.save_model(json_model_filepath)
+
         # Evaluate the best model on the test set
         pred_test = best_model.predict(X_test)
         mse_test = mean_squared_error(y_test, pred_test)
