@@ -99,6 +99,6 @@ for index, row in results_df.iterrows():
     results_df.loc[index, 'RMSE_global_test'] = rmse_scaled
 
 # Save the updated results DataFrame to a new CSV file
-new_results_file_path = os.path.join(results_folder_path, "combine_ML_240724_1608_scaled_2.csv")
+new_results_file_path = os.path.join(combined_folder_path, "combine_ML_240724_1608_scaled_2.csv")
 results_df.to_csv(new_results_file_path, index=False)
 print(f"Updated results saved to {new_results_file_path}")
