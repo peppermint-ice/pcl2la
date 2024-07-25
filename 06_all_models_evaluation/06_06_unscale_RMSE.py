@@ -49,6 +49,9 @@ for index, row in results_df.iterrows():
     regression_model = row['regression_model']
     byyear = row['byyear']
 
+    if float(parameter_value).is_integer():
+        parameter_value = int(parameter_value)
+
     # Set the model file path
     if regression_model == 'xgb':
         model_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_{elimination_status}_best_model_{regression_model}_{byyear}.json"
