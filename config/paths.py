@@ -47,7 +47,8 @@ def get_paths():
         "global_test_sets": os.path.join(config[hostname]["plys"], "data/global_test_sets"),
         "plots": os.path.join(config[hostname]["plys"], "data/plots"),
         "plots_all_reconstructions": os.path.join(config[hostname]["plys"], "data/plots/all_reconstructions"),
-        "plots_one_model": os.path.join(config[hostname]["plys"], "data/plots/one_model")
+        "plots_one_model": os.path.join(config[hostname]["plys"], "data/plots/one_model"),
+        "scalers": os.path.join(config[hostname]["plys"], "data/scalers")
     }
 
     return paths
