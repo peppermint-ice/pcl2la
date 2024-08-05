@@ -61,9 +61,6 @@ def plot_predictions(y_train, y_train_pred, y_test, y_test_pred, r2_train, r2_te
     plt.show()
 
 
-def inverse_transform(scaled_values, mean, scale):
-    return scaled_values * scale + mean
-
 if __name__ == '__main__':
     # Define parameters
     algorithm_name = "marching_cubes"

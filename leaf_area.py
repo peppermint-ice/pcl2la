@@ -732,7 +732,7 @@ def calculate_statistics_trimesh(mesh_file_path, repair=True):
         return simples
 
 
-def eliminate_outliers_and_scale(file_path, export_path):
+def eliminate_outliers_and_scale(file_path, export_path, eliminate=True):
     df = pd.read_csv(file_path)
     print(f"Processing file: {file_path}")
     cols = [
@@ -744,22 +744,23 @@ def eliminate_outliers_and_scale(file_path, export_path):
     for column in cols:
         df = df[df[column] != 0]
 
-    # Calculate limits for outlier removal
-    limits = {}
-    for column in cols:
-        data = df[column]
-        z_limit_top = 3 * data.std() + data.mean()
-        z_limit_bottom = -3 * data.std() + data.mean()
-        limits[column] = [z_limit_top, z_limit_bottom]
+    if eliminate:
+        # Calculate limits for outlier removal
+        limits = {}
+        for column in cols:
+            data = df[column]
+            z_limit_top = 3 * data.std() + data.mean()
+            z_limit_bottom = -3 * data.std() + data.mean()
+            limits[column] = [z_limit_top, z_limit_bottom]
 
-    # Print limits for debugging
-    for column, limit in limits.items():
-        print(f"{column} limits: {limit[1]}, {limit[0]}")
+        # Print limits for debugging
+        for column, limit in limits.items():
+            print(f"{column} limits: {limit[1]}, {limit[0]}")
 
-    # Remove outliers
-    for column, limit in limits.items():
-        df = df[(df[column] < limit[0]) & (df[column] > limit[1])]
-    df.reset_index(drop=True, inplace=True)
+        # Remove outliers
+        for column, limit in limits.items():
+            df = df[(df[column] < limit[0]) & (df[column] > limit[1])]
+        df.reset_index(drop=True, inplace=True)
 
     # Initialize scaler
     scaler = None

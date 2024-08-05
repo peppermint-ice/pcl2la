@@ -19,6 +19,8 @@ def change_column_names(df):
     })
     return df
 
+fig_size = (18, 6)
+
 for year_param in ['byyear', 'noyear']:
     # Set paths
     folder_paths = paths.get_paths()
@@ -27,7 +29,7 @@ for year_param in ['byyear', 'noyear']:
 
     #       R2
     # Load the file
-    file_name = "combine_ML_240724_1608_filtered.csv"
+    file_name = "2507data_filtered_r2.csv"
     file_path = os.path.join(combined_folder_path, file_name)
 
     # Load the filtered dataset
@@ -62,7 +64,7 @@ for year_param in ['byyear', 'noyear']:
     # Create independent plots for each algorithm
     for algorithm in algorithm_names:
         subset = df_filtered[df_filtered['algorithm_name'] == algorithm]
-        plt.figure(figsize=(12, 5))
+        plt.figure(figsize=fig_size)
         plt.grid(True, which='both', axis='y', zorder=1)
         plt.grid(color='gray', linestyle='--', linewidth=0.5)
         ax = sns.barplot(
@@ -77,7 +79,7 @@ for year_param in ['byyear', 'noyear']:
         plt.legend(title='Regression Model', loc='lower right')
 
         # Save the plot with abstract names
-        plot_filename = f"R2_test_{algorithm.replace(' ', '_')}_{year_param}.png"
+        plot_filename = f"{year_param}_R2_test_{algorithm.replace(' ', '_')}.png"
         plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
         plt.savefig(plot_filepath)
         plt.close()
@@ -87,8 +89,10 @@ for year_param in ['byyear', 'noyear']:
     # Identify the best parameter value for each algorithm based on R2_global_test
     best_params = df_filtered.loc[df_filtered.groupby(['algorithm_name', 'regression_model'])['R2_global_test'].idxmax()]
 
+
+
     # Plot 1: Comparison of Regression Models Based on Best Parameter Values
-    plt.figure(figsize=(14, 8))
+    plt.figure(figsize=fig_size)
     ax = sns.barplot(x='algorithm_name', y='R2_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
     if year_param == 'byyear':
         plt.title('Comparison of Regression Models Based on Best Parameter Values. Predicting experiment #2 on data from experiment #1')
@@ -106,7 +110,7 @@ for year_param in ['byyear', 'noyear']:
                     ha='center', va='bottom', fontsize=10, color='black', zorder=4)
 
     # Save the plot with an abstract name
-    plot_filename = f"Best_R2_per_Algorithm_{year_param}.png"
+    plot_filename = f"{year_param}_R2_Best_per_Algorithm.png"
     plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
     plt.savefig(plot_filepath)
     plt.close()
@@ -115,8 +119,8 @@ for year_param in ['byyear', 'noyear']:
     pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name', values='R2_global_test')
 
     # Plot 2: Comparison of Reconstruction Methods
-    plt.figure(figsize=(14, 8))
-    ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3)
+    plt.figure(figsize=fig_size)
+    ax = pivot_data.plot(kind='bar', figsize=fig_size, zorder=3)
     if year_param == 'byyear':
         plt.title('Comparison of Reconstruction Methods. Predicting experiment #2 on data from experiment #1')
     else:
@@ -136,7 +140,7 @@ for year_param in ['byyear', 'noyear']:
     plt.xticks(rotation=0)  # Set x-axis labels to be horizontal
 
     # Save the plot with an abstract name
-    plot_filename = f"Comparison_Reconstruction_Methods_R2_{year_param}"
+    plot_filename = f"{year_param}_R2_Comparison_Reconstruction_Methods"
     plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
     plt.savefig(plot_filepath)
     plt.close()
@@ -144,7 +148,7 @@ for year_param in ['byyear', 'noyear']:
     #       RMSE
 
     # Load the file
-    file_name = "combine_ML_240724_1608_scaled_filtered_rmse.csv"
+    file_name = "2507data_filtered_rmse.csv"
     file_path = os.path.join(combined_folder_path, file_name)
 
     # Load the filtered dataset
@@ -161,22 +165,22 @@ for year_param in ['byyear', 'noyear']:
     # Create independent plots for each algorithm
     for algorithm in algorithm_names:
         subset = df_filtered[df_filtered['algorithm_name'] == algorithm]
-        plt.figure(figsize=(12, 5))
+        plt.figure(figsize=fig_size)
         plt.grid(True, which='both', axis='y', zorder=1)
         plt.grid(color='gray', linestyle='--', linewidth=0.5)
         ax = sns.barplot(
             x='parameter_value', y='RMSE_global_test', hue='regression_model', data=subset, palette=model_colors, zorder=2
         )
         if year_param == 'byyear':
-            plt.title(f'R² on test set for {algorithm}. Predicting experiment #2 on data from experiment #1')
+            plt.title(f'RMSE on test set for {algorithm}. Predicting experiment #2 on data from experiment #1')
         else:
-            plt.title(f'R² on test set for {algorithm}')
+            plt.title(f'RMSE on test set for {algorithm}')
         plt.xlabel('Parameter Value')
         plt.ylabel('RMSE on test subset, cm²')
         plt.legend(title='Regression Model', loc='lower right')
 
         # Save the plot with abstract names
-        plot_filename = f"RMSE_test_{algorithm.replace(' ', '_')}_{year_param}.png"
+        plot_filename = f"{year_param}_RMSE_test_{algorithm.replace(' ', '_')}.png"
         plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
         plt.savefig(plot_filepath)
         plt.close()
@@ -187,7 +191,7 @@ for year_param in ['byyear', 'noyear']:
     best_params = df_filtered.loc[df_filtered.groupby(['algorithm_name', 'regression_model'])['RMSE_global_test'].idxmin()]
 
     # Plot 1: Comparison of Regression Models Based on Best Parameter Values
-    plt.figure(figsize=(14, 8))
+    plt.figure(figsize=fig_size)
     ax = sns.barplot(x='algorithm_name', y='RMSE_global_test', hue='regression_model', data=best_params, palette=model_colors, zorder=3)
     if year_param == 'byyear':
         plt.title(
@@ -206,7 +210,7 @@ for year_param in ['byyear', 'noyear']:
                     ha='center', va='bottom', fontsize=10, color='black', zorder=4)
 
     # Save the plot with an abstract name
-    plot_filename = f"Best_RMSE_per_Algorithm_{year_param}"
+    plot_filename = f"{year_param}_RMSE_Best_per_Algorithm"
     plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
     plt.savefig(plot_filepath)
     plt.close()
@@ -215,8 +219,8 @@ for year_param in ['byyear', 'noyear']:
     pivot_data = best_params.pivot(index='regression_model', columns='algorithm_name', values='RMSE_global_test')
 
     # Plot 2: Comparison of Reconstruction Methods
-    plt.figure(figsize=(14, 8))
-    ax = pivot_data.plot(kind='bar', figsize=(14, 8), zorder=3)
+    plt.figure(figsize=fig_size)
+    ax = pivot_data.plot(kind='bar', figsize=fig_size, zorder=3)
     if year_param == 'byyear':
         plt.title('Comparison of Reconstruction Methods. Predicting experiment #2 on data from experiment #1')
     else:
@@ -236,7 +240,8 @@ for year_param in ['byyear', 'noyear']:
     plt.xticks(rotation=0)  # Set x-axis labels to be horizontal
 
     # Save the plot with an abstract name
-    plot_filename = f"Comparison_Reconstruction_Methods_RMSE_{year_param}"
+    plot_filename = f"{year_param}_RMSE_Comparison_Reconstruction_Methods"
     plot_filepath = os.path.join(plots_all_reconstructions_folder_path, plot_filename)
     plt.savefig(plot_filepath)
     plt.close()
+
