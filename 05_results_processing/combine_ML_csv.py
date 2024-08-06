@@ -8,7 +8,7 @@ from datetime import datetime
 folder_paths = paths.get_paths()
 
 # Set folder
-csv_folder_path = folder_paths["kfold_results"]
+csv_folder_path = folder_paths["results"]
 
 csvs = os.listdir(csv_folder_path)
 
@@ -24,6 +24,6 @@ for file in csvs:
 
 
 current_time = datetime.now().strftime("%d%m%y_%H%M")
-csv_export_path = os.path.join(folder_paths["combined"], f"combine_train_{current_time}.csv")
+csv_export_path = os.path.join(folder_paths["combined"], f"combine_test_{current_time}.csv")
 print(csv_export_path)
 df.to_csv(csv_export_path, index=False)
