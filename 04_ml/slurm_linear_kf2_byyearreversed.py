@@ -3,14 +3,13 @@ import os
 import sys
 import re
 
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import LinearRegression
 from boruta import BorutaPy
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
-from scipy.stats import randint
-from sklearn.model_selection import RandomizedSearchCV, KFold, train_test_split
-from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.feature_selection import mutual_info_regression
+from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.model_selection import KFold, train_test_split
 import pickle
 from config import paths
 
@@ -46,22 +45,20 @@ if __name__ == '__main__':
         'Repaired',
         'Eliminated',
         'Regression_model',
-        'K_fold',
         'RMSE_score_calibration',
         'RMSE_score_validation',
         'R2_score_calibration',
         'R2_score_validation',
         'Successful_reconstructions_test',
-        'Successful_reconstructions_train'
-    ]
+        'Successful_reconstructions_train']
     current_results = dict.fromkeys(keys)
     results = pd.DataFrame()
 
     try:
-        print('starting grid search')
+        print('starting linear regression')
         # Split dataset into train and test using 'experiment_number' value. 2023 for exp 1, 2024 for exp 2
-        train_df = df[df['experiment_number'] == 1].drop(columns=['experiment_number'])
-        test_df = df[df['experiment_number'] == 2].drop(columns=['experiment_number'])
+        train_df = df[df['experiment_number'] == 2].drop(columns=['experiment_number'])
+        test_df = df[df['experiment_number'] == 1].drop(columns=['experiment_number'])
 
         # Prepare training and test data
         X_train = train_df.drop(columns=['measured_leaf_area'])
@@ -92,7 +89,7 @@ if __name__ == '__main__':
         y_test = y_test.reset_index(drop=True)
 
         # Save the global test set
-        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_ridge_global_test_set_byyear.csv"
+        global_test_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_linear_global_test_set_byyearreveresed.csv"
         global_test_filepath = os.path.join(global_test_path, global_test_filename)
         test_selected = pd.concat([X_test_boruta, y_test.reset_index(drop=True)], axis=1)
         test_selected.to_csv(global_test_filepath, index=False)
@@ -101,10 +98,7 @@ if __name__ == '__main__':
         X_train = X_train_boruta
         X_test = X_test_boruta
 
-        # Define distributions for hyperparameters
-        param_dist = {
-            'alpha': [0.001, 0.01, 0.1, 1, 10, 100]
-        }
+
         # Initialize KFold cross-validator
         num_splits = 6
         kf = KFold(n_splits=num_splits, shuffle=True)
@@ -117,20 +111,9 @@ if __name__ == '__main__':
             X_train_fold, X_val_fold = X_train.iloc[train_index], X_train.iloc[val_index]
             y_train_fold, y_val_fold = y_train.iloc[train_index], y_train.iloc[val_index]
 
-            # Perform random search with cross-validation
-            random_search = RandomizedSearchCV(Ridge(), param_distributions=param_dist, n_iter=100,
-                                               cv=5,
-                                               scoring='neg_mean_squared_error')
-            random_search.fit(X_train_fold, y_train_fold)
-
-            # Get the best hyperparameters found by random search
-            best_params = random_search.best_params_
-            print(f"Best Hyperparameters for fold {i}: {best_params}")
-
-            # Train model with best hyperparameters
-            model = Ridge(**best_params)
-            model.fit(X_train_fold, y_train_fold)
-
+            # Fit linear regression model
+            model = LinearRegression()
+            model.fit(X_train, y_train)
             pred_train = model.predict(X_train_fold)
             pred_val = model.predict(X_val_fold)
             mse_train = mean_squared_error(y_train_fold, pred_train)
@@ -144,7 +127,7 @@ if __name__ == '__main__':
                 'Assessment_name': assessment_name,
                 'Repaired': repaired,
                 'Eliminated': eliminated,
-                'Regression_model': 'Ridge',
+                'Regression_model': 'Linear',
                 'K_fold': i,
                 'RMSE_score_calibration': mse_train,
                 'RMSE_score_validation': mse_val,
@@ -155,13 +138,13 @@ if __name__ == '__main__':
             }
             results = pd.concat([results, pd.DataFrame([current_results])], ignore_index=True)
             # Save train and validation datasets as CSV files
-            train_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_train_kf_ridge_fold_{i}_byyear.csv"
+            train_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_train_kf_linear_fold_{i}_byyearreveresed.csv"
             train_filepath = os.path.join(train_folder_path, train_filename)
             train_set = X_train_fold.copy()
             train_set['measured_leaf_area'] = y_train_fold
             train_set.to_csv(train_filepath, index=False)
 
-            val_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_val_kf_ridge_fold_{i}_byyear.csv"
+            val_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_val_kf_linear_fold_{i}_byyearreveresed.csv"
             val_filepath = os.path.join(test_folder_path, val_filename)
             val_set = X_val_fold.copy()
             val_set['measured_leaf_area'] = y_val_fold
@@ -173,8 +156,8 @@ if __name__ == '__main__':
                 best_fold_index = i
                 best_model = model
 
-        # Save the best model using pickle
-        model_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_best_model_ridge_byyear.pkl"
+            # Save the best model using pickle
+        model_filename = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_best_model_linear_byyearreveresed.pkl"
         model_filepath = os.path.join(model_folder_path, model_filename)
         with open(model_filepath, 'wb') as f:
             pickle.dump(best_model, f)
@@ -191,17 +174,17 @@ if __name__ == '__main__':
             'Assessment_name': assessment_name,
             'Repaired': repaired,
             'Eliminated': eliminated,
-            'Regression_model': 'Ridge',
+            'Regression_model': 'Linear',
             'RMSE_score_test': mse_test,
             'R2_score_test': r2_test
         }
         test_results_df = pd.DataFrame([test_results])
-        test_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_test_results_ridge_byyear.csv"
+        test_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_test_results_linear_byyearreveresed.csv"
         test_output_file_path = os.path.join(csv_folder_path, test_output_file)
         test_results_df.to_csv(test_output_file_path, index=False)
 
         # Save the k-fold results
-        kfold_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_kfold_results_ridge_byyear.csv"
+        kfold_output_file = f"{parameter_name}_{parameter_value}_{assessment_name}_{repaired}_{eliminated}_kfold_results_linear_byyearreveresed.csv"
         kfold_output_file_path = os.path.join(kfold_results_path, kfold_output_file)
         results.to_csv(kfold_output_file_path, index=False)
 

@@ -59,10 +59,8 @@ if __name__ == '__main__':
     try:
         print('starting grid search')
         # Split dataset into train and test using 'experiment_number' value. 2023 for exp 1, 2024 for exp 2
-        train_df = df[df['experiment_number'] == 1]
-        train_df.drop(columns=['experiment_number'], inplace=True)
-        test_df = df[df['experiment_number'] == 2]
-        test_df.drop(columns=['experiment_number'], inplace=True)
+        train_df = df[df['experiment_number'] == 1].drop(columns=['experiment_number'])
+        test_df = df[df['experiment_number'] == 2].drop(columns=['experiment_number'])
 
         # Prepare training and test data
         X_train = train_df.drop(columns=['measured_leaf_area'])
