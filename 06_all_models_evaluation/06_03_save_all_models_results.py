@@ -3,12 +3,32 @@ import xgboost as xgb
 import os
 import re
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, mean_squared_error
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from config import paths
 from datetime import datetime
+
+
+def unscale(df_scaled, df_original, scaler, type: str):
+    original_columns = df_original.columns.difference(["experiment_number"])
+    experiment_number = df_original["experiment_number"]
+    # Fill empty columns
+    for column in original_columns:
+        if column not in df_scaled.columns:
+            df_scaled[column] = 0
+    df_filled = df_scaled[original_columns]
+    # Unscale it using scaler
+    df_unscaled = pd.DataFrame(scaler.inverse_transform(df_filled), columns=df_filled.columns)
+    if type == 'original':
+        df_unscaled = pd.concat([df_unscaled, experiment_number], axis=1)
+    else:
+        if type == 'testset':
+            selected_features = df_scaled.columns
+            df_unscaled = df_unscaled[selected_features]
+        elif type == 'prediction':
+            df_unscaled = df_unscaled['measured_leaf_area']
+    return df_unscaled
 
 
 def run_any_model(regression_model, x, model):
@@ -21,9 +41,6 @@ def run_any_model(regression_model, x, model):
     return y_pred
 
 
-def inverse_transform(scaled_values, mean, scale):
-    return scaled_values * scale + mean
-
 if __name__ == '__main__':
     # Set folder paths
     folder_paths = paths.get_paths()
@@ -31,7 +48,8 @@ if __name__ == '__main__':
     global_test_sets_path = folder_paths["global_test_sets"]
     train_folder_path = folder_paths["train_sets"]
     test_folder_path = folder_paths["test_sets"]
-    ready_for_training_path = folder_paths["ready_for_training"]
+    ready_for_training_folder_path = folder_paths["ready_for_training"]
+    scalers_folder_path = folder_paths["scalers"]
 
     # List to store results
     results = []
@@ -86,13 +104,18 @@ if __name__ == '__main__':
                         model = pickle.load(file)
                 print("Model loaded")
 
-                # Load the original unscaled dataset and fit the scaler if elimination status is "elim"
+                # Load scaler and the original unscaled dataset if necessary
                 scaler = None
                 if elimination_status == "elim":
-                    unscaled_data_path = os.path.join(ready_for_training_path, f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_noElim.csv")
-                    unscaled_data = pd.read_csv(unscaled_data_path)
-                    scaler = StandardScaler()
-                    scaler.fit(unscaled_data.drop('measured_leaf_area', axis=1))
+                    # Load scaler
+                    scaler_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_scaler.pkl"
+                    scaler_file_path = os.path.join(scalers_folder_path, scaler_file_name)
+                    scaler = pickle.load(open(scaler_file_path, 'rb'))
+                    # Load original dataset
+                    original_dataset_file_name = f"{algorithm_name}_{parameter_value}_{assessment_name}_{dataset_type}_noElim.csv"
+                    original_dataset_file_path = os.path.join(ready_for_training_folder_path,
+                                                              original_dataset_file_name)
+                    df_original = pd.read_csv(original_dataset_file_path)
 
                 # Load test set
                 global_test_df = pd.read_csv(global_test_set_file_path)
@@ -111,8 +134,16 @@ if __name__ == '__main__':
                     y_pred = run_any_model(regression_model, x, model)
                     # Reverse scaling if elimination status is "elim"
                     if elimination_status == "elim" and scaler is not None:
-                        y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
-                        y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
+                        # Unscale test dataset
+                        global_test_df = unscale(global_test_df, df_original, scaler, "testset")
+                        # Unscale predictions
+                        y_pred = unscale(pd.DataFrame({"measured_leaf_area": y_pred}), df_original, scaler,
+                                         "prediction").values
+                        print(y_pred)
+                        # Extract features and target
+                        x = global_test_df.drop(columns=['measured_leaf_area'])
+                        y = global_test_df['measured_leaf_area']
+                        print(y)
                     # Get R2 and RMSE
                     r2_global_test = r2_score(y, y_pred)
                     rmse_global_test = mean_squared_error(y, y_pred, squared=False)
@@ -127,9 +158,18 @@ if __name__ == '__main__':
                         # Run the model
                         y_pred = run_any_model(regression_model, x, model)
                         # Reverse scaling if elimination status is "elim"
+
                         if elimination_status == "elim" and scaler is not None:
-                            y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
-                            y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
+                            # Unscale test dataset
+                            test_df = unscale(test_df, df_original, scaler, "testset")
+                            # Unscale predictions
+                            y_pred = unscale(pd.DataFrame({"measured_leaf_area": y_pred}), df_original, scaler,
+                                             "prediction").values
+                            print(y_pred)
+                            # Extract features and target
+                            x = test_df.drop(columns=['measured_leaf_area'])
+                            y = test_df['measured_leaf_area']
+                            print(y)
                         # Get R2
                         r2 = r2_score(y, y_pred)
                         r2_testing.append(r2)
@@ -145,8 +185,16 @@ if __name__ == '__main__':
                         y_pred = run_any_model(regression_model, x, model)
                         # Reverse scaling if elimination status is "elim"
                         if elimination_status == "elim" and scaler is not None:
-                            y_pred = inverse_transform(y_pred, scaler.mean_[-1], scaler.scale_[-1])
-                            y = inverse_transform(y, scaler.mean_[-1], scaler.scale_[-1])
+                            # Unscale test dataset
+                            train_df = unscale(train_df, df_original, scaler, "testset")
+                            # Unscale predictions
+                            y_pred = unscale(pd.DataFrame({"measured_leaf_area": y_pred}), df_original, scaler,
+                                             "prediction").values
+                            print(y_pred)
+                            # Extract features and target
+                            x = train_df.drop(columns=['measured_leaf_area'])
+                            y = train_df['measured_leaf_area']
+                            print(y)
                         # Get R2
                         r2 = r2_score(y, y_pred)
                         r2_training.append(r2)
