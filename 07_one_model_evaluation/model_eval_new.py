@@ -37,7 +37,8 @@ def plot_distributions(train_set, test_set, fold_num, scaler, before=True):
     plt.legend()
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.savefig(os.path.join(folder_paths['plots'], '20241031', 'dist.png'), dpi=600)
 
 
 def plot_predictions(y_train, y_train_pred, y_test, y_test_pred, r2_train, r2_test, fold_num, before=True):

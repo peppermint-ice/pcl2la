@@ -94,7 +94,6 @@ if __name__ == '__main__':
                 global_test_set_file_path = os.path.join(global_test_sets_path, global_test_set_file_name)
                 test_file_paths = [os.path.join(test_folder_path, test_file_names[i]) for i in range(len(test_file_names))]
                 train_file_paths = [os.path.join(train_folder_path, train_file_names[i]) for i in range(len(train_file_names))]
-
                 # Load model
                 with open(model_file_path, 'rb') as file:
                     if regression_model == 'xgb':
@@ -117,13 +116,13 @@ if __name__ == '__main__':
                                                               original_dataset_file_name)
                     df_original = pd.read_csv(original_dataset_file_path)
 
+                # Load datasets
                 # Load test set
                 global_test_df = pd.read_csv(global_test_set_file_path)
                 # Load test and train datasets
                 test_dfs = [pd.read_csv(test_file_paths[i]) for i in range(len(test_file_paths))]
                 train_dfs = [pd.read_csv(train_file_paths[i]) for i in range(len(train_file_paths))]
                 print("Files loaded")
-
                 try:
                     # GLOBAL TEST
                     print("Global test")
@@ -139,11 +138,9 @@ if __name__ == '__main__':
                         # Unscale predictions
                         y_pred = unscale(pd.DataFrame({"measured_leaf_area": y_pred}), df_original, scaler,
                                          "prediction").values
-                        print(y_pred)
                         # Extract features and target
                         x = global_test_df.drop(columns=['measured_leaf_area'])
                         y = global_test_df['measured_leaf_area']
-                        print(y)
                     # Get R2 and RMSE
                     r2_global_test = r2_score(y, y_pred)
                     rmse_global_test = mean_squared_error(y, y_pred, squared=False)
@@ -153,23 +150,21 @@ if __name__ == '__main__':
                     print("Testing sets")
                     r2_testing = []
                     for test_df in test_dfs:
+                        # Extract X and Y
                         x = test_df.drop('measured_leaf_area', axis=1)
                         y = test_df['measured_leaf_area']
                         # Run the model
                         y_pred = run_any_model(regression_model, x, model)
                         # Reverse scaling if elimination status is "elim"
-
                         if elimination_status == "elim" and scaler is not None:
                             # Unscale test dataset
                             test_df = unscale(test_df, df_original, scaler, "testset")
                             # Unscale predictions
                             y_pred = unscale(pd.DataFrame({"measured_leaf_area": y_pred}), df_original, scaler,
                                              "prediction").values
-                            print(y_pred)
                             # Extract features and target
                             x = test_df.drop(columns=['measured_leaf_area'])
                             y = test_df['measured_leaf_area']
-                            print(y)
                         # Get R2
                         r2 = r2_score(y, y_pred)
                         r2_testing.append(r2)
@@ -179,6 +174,7 @@ if __name__ == '__main__':
                     print("Training sets")
                     r2_training = []
                     for train_df in train_dfs:
+                        # Extract X and Y
                         x = train_df.drop('measured_leaf_area', axis=1)
                         y = train_df['measured_leaf_area']
                         # Run the model
@@ -190,11 +186,9 @@ if __name__ == '__main__':
                             # Unscale predictions
                             y_pred = unscale(pd.DataFrame({"measured_leaf_area": y_pred}), df_original, scaler,
                                              "prediction").values
-                            print(y_pred)
                             # Extract features and target
                             x = train_df.drop(columns=['measured_leaf_area'])
                             y = train_df['measured_leaf_area']
-                            print(y)
                         # Get R2
                         r2 = r2_score(y, y_pred)
                         r2_training.append(r2)
