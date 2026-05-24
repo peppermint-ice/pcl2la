@@ -63,7 +63,7 @@ scatter = plt.scatter(tsne_df_subset['TSNE1'], tsne_df_subset['TSNE2'], c=tsne_d
 
 # Add colorbar and customize its font size
 colorbar = plt.colorbar(scatter)
-colorbar.set_label('Measured TLA, cm²', fontsize=16)  # Set colorbar label font size
+colorbar.set_label('Measured TLA (cm²)', fontsize=16)  # Set colorbar label font size
 colorbar.ax.tick_params(labelsize=16)  # Set colorbar tick label font size
 
 # Customize plot labels and title
@@ -75,7 +75,7 @@ plt.yticks(fontsize=16)
 
 # Show plot
 # plt.show()
-plt.savefig(os.path.join(folder_paths['plots'], '20250116', 'tsne.png'), dpi=600)
+plt.savefig(os.path.join(folder_paths['plots'], '20250225', 'tsne.png'), dpi=600)
 
 
 # Prepare the data for clustering analysis

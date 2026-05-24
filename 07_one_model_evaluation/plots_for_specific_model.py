@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     # Set plot options
     limit = False
-    metric_type = False
+    metric_type = 'mae'
 
     # Format algorithm_name and parameter_value for display
     formatted_algorithm_name = format_text(algorithm_name)
@@ -193,8 +193,8 @@ if __name__ == '__main__':
     plt.figure(figsize=(10, 10))
     plt.scatter(y_test, y_pred, alpha=0.3, s=100)
     plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
-    plt.xlabel('Measured TLA, cm²', fontsize=16)
-    plt.ylabel('Predicted TLA, cm²', fontsize=16)
+    plt.xlabel('Measured TLA (cm²)', fontsize=16)
+    plt.ylabel('Predicted TLA (cm²)', fontsize=16)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
     plt.title('Actual Vs. Predicted TLA', fontsize=16)
@@ -215,13 +215,13 @@ if __name__ == '__main__':
         plt.text(0.05, 0.95, f'R² = {r2:.2f}', transform=plt.gca().transAxes,
                  fontsize=16, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
     else:
-        plt.text(0.05, 0.95, f'R² = {r2:.2f}\n{metric_name} = {metric_value:.0f} cm²', transform=plt.gca().transAxes,
+        plt.text(0.05, 0.95, f'R² = {r2:.2f}\n{metric_name} = {metric_value:.0f} (cm²)', transform=plt.gca().transAxes,
                  fontsize=16, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
     plt.text(0.05, 0.85, f'3D Reconstruction Algorithm: {formatted_algorithm_name}\n{parameter_value_type[algorithm_name]} Value: {formatted_parameter_value}\nRegression Model: {model_names[regression_model]}', transform=plt.gca().transAxes,
              fontsize=16, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 
     # plt.show()
-    plt.savefig(os.path.join(folder_paths['plots'], '20250116', f'pred_{metric_type}.png'), dpi=600)
+    plt.savefig(os.path.join(folder_paths['plots'], '20250225', f'pred_{metric_type}.png'), dpi=600)
 
     # # Plot linear fit
     # # Calculate R² for the linear regression model
@@ -249,7 +249,7 @@ if __name__ == '__main__':
     # plt.text(0.05, 0.85, f'3D Reconstruction Algorithm: {formatted_algorithm_name}\n{parameter_value_type[algorithm_name]} Value: {formatted_parameter_value}\nRegression Model: {model_names[regression_model]}', transform=plt.gca().transAxes,
     #          fontsize=12, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
     # plt.show()
-    # # plt.savefig(os.path.join(folder_paths['plots'], '20241031', 'pred.png'), dpi=600)
+    # # plt.savefig(os.path.join(folder_paths['plots'], '20250225', 'pred.png'), dpi=600)
 
     # Plot residuals
     # Calculate residuals
@@ -259,8 +259,8 @@ if __name__ == '__main__':
     plt.figure(figsize=(10, 10))
     plt.scatter(y_pred, residuals, alpha=0.3, s=100)
     plt.axhline(0, color='r', linestyle='--', lw=2)  # Line at y=0 to indicate no residual
-    plt.xlabel('Predicted TLA, cm²', fontsize=16)
-    plt.ylabel('Residuals (Measured - Predicted), cm²', fontsize=16)
+    plt.xlabel('Predicted TLA (cm²)', fontsize=16)
+    plt.ylabel('Residuals (Measured - Predicted) (cm²)', fontsize=16)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
     plt.title('Residuals Plot', fontsize=16)
@@ -273,7 +273,7 @@ if __name__ == '__main__':
         plt.text(0.05, 0.95, f'R² = {r2:.2f}', transform=plt.gca().transAxes,
                  fontsize=16, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
     else:
-        plt.text(0.05, 0.95, f'R² = {r2:.2f}\n{metric_name} = {metric_value:.0f} cm²', transform=plt.gca().transAxes,
+        plt.text(0.05, 0.95, f'R² = {r2:.2f}\n{metric_name} = {metric_value:.0f} (cm²)', transform=plt.gca().transAxes,
                  fontsize=16, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
     plt.text(0.05, 0.80,
          f'3D Reconstruction Algorithm: {formatted_algorithm_name}\n{parameter_value_type[algorithm_name]} Value: {formatted_parameter_value}\nRegression Model: {model_names[regression_model]}',
@@ -282,7 +282,7 @@ if __name__ == '__main__':
 
     # Save the residual plot
     # plt.show()
-    plt.savefig(os.path.join(folder_paths['plots'], '20250116', f'residuals_{metric_type}.png'), dpi=600)
+    plt.savefig(os.path.join(folder_paths['plots'], '20250225', f'residuals_{metric_type}.png'), dpi=600)
 
     # Plot feature importance
     if regression_model != "linear" and regression_model != "mlp":
@@ -295,8 +295,8 @@ if __name__ == '__main__':
         plt.figure()
         plt.pie(scores, labels=features, autopct='%1.1f%%', startangle=140)
         plt.title('Feature importance analysis of the best yielding XGBoost model')
-        plt.show()
-        # plt.savefig(os.path.join(folder_paths['plots'], '20241031', 'feat.png'), dpi=400)
+        # plt.show()
+        plt.savefig(os.path.join(folder_paths['plots'], '20241031', 'feat.png'), dpi=400)
 
 
     # Plot histogram of measured leaf area
@@ -316,18 +316,18 @@ if __name__ == '__main__':
                  palette='deep',
                  alpha=0.7)
     # Add labels and title
-    plt.xlabel('Measured TLA, cm²', fontsize=16)
+    plt.xlabel('Measured TLA (cm²)', fontsize=16)
     plt.ylabel('Frequency', fontsize=16)
     plt.title('Histogram of Measured TLA by Exp. #', fontsize=16)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
     # Add mean and median lines
-    plt.axvline(mean_value, color='r', linestyle='--', label=f'Mean: {mean_value:.0f} cm²')
-    plt.axvline(median_value, color='b', linestyle='-', label=f'Median: {median_value:.0f} cm²')
+    plt.axvline(mean_value, color='r', linestyle='--', label=f'Mean: {mean_value:.0f} (cm²)')
+    plt.axvline(median_value, color='b', linestyle='-', label=f'Median: {median_value:.0f} (cm²)')
     # Add legend
-    plt.legend(labels=['Exp. #1', 'Exp. #2', f'Mean: {mean_value:.0f} cm²', f'Median: {median_value:.0f} cm²'],
+    plt.legend(labels=['Exp. #1', 'Exp. #2', f'Mean: {mean_value:.0f} (cm²)', f'Median: {median_value:.0f} (cm²)'],
                fontsize=16)
 
     # Show plot
     # plt.show()
-    plt.savefig(os.path.join(folder_paths['plots'], '20250116', 'dist.png'), dpi=600)
+    plt.savefig(os.path.join(folder_paths['plots'], '20250225', 'dist.png'), dpi=600)
